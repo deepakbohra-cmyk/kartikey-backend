@@ -78,24 +78,21 @@ public class SecurityConfig {
                                 "/login/oauth2/**",
                                 "/h2-console/**",
                                 "/favicon.ico",
-                                "/error",          // ✅ must allow error page
+                                "/error",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/webjars/**"      // ✅ static resources
+                                "/webjars/**"
                         ).permitAll()
 
                         // User endpoints
                         .requestMatchers("/api/user/profile").authenticated()
-
-                        // ✅ all other requests need authentication
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2Login(oauth2 -> oauth2
                         .successHandler(oAuth2AuthenticationSuccessHandler)
-                        .failureUrl("/login?error=oauth2_error")
                 )
                 // ✅ allow H2 console
                 .headers(headers -> headers.frameOptions(frame -> frame.disable()));

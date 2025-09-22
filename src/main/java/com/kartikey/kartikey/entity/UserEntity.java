@@ -1,12 +1,9 @@
 package com.kartikey.kartikey.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
+import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -39,8 +36,21 @@ public class UserEntity {
     @Column(nullable = false)
     private Role role;
 
+    @Column(name = "tl_email")
+    private String tlEmail;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    // Reverse mappings
+    @OneToMany(mappedBy = "agent")
+    private List<FeedBack> feedbacksAsAgent;
+
+    @OneToMany(mappedBy = "qcReviewer")
+    private List<FeedBack> feedbacksAsQC;
+
+    @OneToMany(mappedBy = "teamLead")
+    private List<FeedBack> feedbacksAsTL;
 
     @PrePersist
     protected void onCreate() {
@@ -53,5 +63,4 @@ public class UserEntity {
         L1TEAM,
         QCTEAM
     }
-
 }

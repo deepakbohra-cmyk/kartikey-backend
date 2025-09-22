@@ -1,1 +1,6 @@
+# Environment files
 .env
+.env.*
+
+# Maven/Gradle build output
+/target

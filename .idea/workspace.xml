@@ -5,7 +5,68 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4c7545ab-523f-4fd9-b220-19deb8c42c64" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/FeedBackController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/feedback/FeedBackRequestDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/feedback/FeedBackResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/user/UserDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/user/UserEntityDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FeedBack.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/EmailAlreadyExistsException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/InvalidRoleAssignmentException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/UserNotFoundException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/repository/FeedBackRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/EmailService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/FeedBackService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/UserDataService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/EmailServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FeedBackServiceImpl.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/UserDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/testdb.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/testdb.mv.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/OAuth2AuthenticationSuccessHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/OAuth2AuthenticationSuccessHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/UserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/UserController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/formdata/FormDataDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/formdata/FormDataDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FormData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FormData.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/UserEntity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/GlobalExceptionHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/GlobalExceptionHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/UserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FormDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FormDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/application.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/KartikeyApplication.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/config/OAuth2AuthenticationSuccessHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/config/PasswordConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/config/SecurityConfig.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/config/jwtconfig/JwtAuthenticationEntryPoint.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/config/jwtconfig/JwtRequestFilter.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/controller/AuthController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/controller/L1TeamController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/controller/OAuth2RedirectController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/controller/QcTeamController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/controller/UserController.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/dto/formdata/FormDataDTO$FormDataDTOBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/dto/formdata/FormDataDTO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/dto/formdata/FormDataFilterDTO.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/dto/user/LoginRequest.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/dto/user/LoginResponse.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/FormData$FormDataBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/FormData$WorkType.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/FormData.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/UserEntity$Role.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/UserEntity$UserEntityBuilder.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/entity/UserEntity.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/exception/GlobalExceptionHandler.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/repository/FormDataRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/repository/UserRepository.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/service/FormDataService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/service/JwtService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/service/UserService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/service/impl/FormDataServiceImpl.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/kartikey/kartikey/specification/FormDataSpecification.class" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -17,6 +78,7 @@
       <list>
         <option value="Interface" />
         <option value="Class" />
+        <option value="Record" />
       </list>
     </option>
   </component>
@@ -88,5 +150,16 @@
       <updated>1758007283683</updated>
     </task>
     <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
 </project>

@@ -63,6 +63,7 @@ public class AuthController {
             String email = request.get("email");
             String roleStr = request.getOrDefault("role", "L1TEAM");
             String location = request.get("location");
+            String tlEmail = request.get("tlEmail");
 
             UserEntity.Role role;
             try {
@@ -71,7 +72,7 @@ public class AuthController {
                 role = UserEntity.Role.L1TEAM;
             }
 
-            UserEntity userEntity = userService.createUser(username, password, email, role , location);
+            UserEntity userEntity = userService.createUser(username, password, email, role , location , tlEmail);
             String token = jwtService.generateTokenWithUserDetails(userEntity);
 
             return ResponseEntity.ok(new LoginResponse(

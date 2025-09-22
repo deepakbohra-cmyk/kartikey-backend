@@ -73,7 +73,8 @@ public class FormDataServiceImpl implements FormDataService {
                 .workType(formData.getWorkType())
                 .gid(formData.getGid())
                 .decision(formData.getDecision())
-                .createdAt(formData.getCreatedAt())
+                .date(formData.getCreatedAt() != null ? formData.getCreatedAt().toLocalDate() : null)
+                .time(formData.getCreatedAt() != null ? formData.getCreatedAt().toLocalTime() : null)
                 .build();
     }
 

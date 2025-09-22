@@ -1,6 +1,8 @@
 package com.kartikey.kartikey.service;
 
 import com.kartikey.kartikey.entity.UserEntity;
+import com.kartikey.kartikey.exception.InvalidRoleAssignmentException;
+import com.kartikey.kartikey.exception.UserNotFoundException;
 import com.kartikey.kartikey.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,15 +55,12 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public UserEntity createUser(String username, String password, String email , String location) {
-        return createUser(username, password, email, UserEntity.Role.L1TEAM , location);
+    public UserEntity createUser(String username, String password, String email , String location , String qaEmail , String tlEmail) {
+        return createUser(username, password, email, UserEntity.Role.L1TEAM , location, tlEmail);
     }
 
     @Transactional
-    public UserEntity createUser(String username, String password, String email, UserEntity.Role role , String location) {
-        if (userRepository.existsByUsername(username)) {
-            throw new RuntimeException("Username already exists");
-        }
+    public UserEntity createUser(String username, String password, String email, UserEntity.Role role , String location , String tlEmail) {
         if (userRepository.existsByEmail(email)) {
             throw new RuntimeException("Email already exists");
         }
@@ -73,6 +72,7 @@ public class UserService implements UserDetailsService {
                 .provider("local")
                 .role(role)
                 .location(location)
+                .tlEmail(tlEmail)
                 .build();
 
         return userRepository.save(userEntity);

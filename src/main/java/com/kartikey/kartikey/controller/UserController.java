@@ -1,12 +1,13 @@
 package com.kartikey.kartikey.controller;
 
-import com.kartikey.kartikey.entity.UserEntity;
-import com.kartikey.kartikey.service.UserService;
+import com.kartikey.kartikey.dto.user.UserDTO;
+import com.kartikey.kartikey.dto.user.UserEntityDTO;
+import com.kartikey.kartikey.service.UserDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -15,25 +16,42 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserDataService userDataService;
 
-    @GetMapping("/profile")
-    public ResponseEntity<?> getUserProfile(Authentication authentication) {
-        if (authentication == null || !authentication.isAuthenticated()) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
-        }
-
-        String email = authentication.getName();
-
-        UserEntity userEntity = userService.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        return ResponseEntity.ok(Map.of(
-                "id", userEntity.getId(),
-                "username", userEntity.getUsername(),
-                "email", userEntity.getEmail(),
-                "role", userEntity.getRole().name(),
-                "createdAt", userEntity.getCreatedAt()
-        ));
+    @GetMapping("/alluser")
+    public ResponseEntity<List<UserDTO>> getAllUser() {
+        List<UserDTO> users = userDataService.getAllUser();
+        return ResponseEntity.ok(users);
     }
+
+    @PostMapping("/add")
+    public ResponseEntity<?> register(@RequestBody UserEntityDTO userEntityDTO) {
+        try {
+            UserDTO saved = userDataService.addUser(userEntityDTO);
+            return ResponseEntity.ok(saved);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PatchMapping("/edit/{id}")
+    public ResponseEntity<?> editUser(@PathVariable Long id, @RequestBody UserEntityDTO userDTO) {
+        try {
+            UserDTO updated = userDataService.updateUser(id, userDTO);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
+        try {
+            userDataService.deleteUser(id);
+            return ResponseEntity.ok(Map.of("message", "User deleted successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
 }

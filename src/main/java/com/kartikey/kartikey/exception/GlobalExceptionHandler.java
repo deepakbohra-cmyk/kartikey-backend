@@ -30,5 +30,15 @@ public class GlobalExceptionHandler {
                         "status", 500
                 ));
     }
+
+    @ExceptionHandler(EmailAlreadyExistsException.class)
+    public ResponseEntity<String> handleEmailExists(EmailAlreadyExistsException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(ex.getMessage());
+    }
+
+    @ExceptionHandler({UserNotFoundException.class, InvalidRoleAssignmentException.class})
+    public ResponseEntity<String> handleNotFound(RuntimeException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
 }
 

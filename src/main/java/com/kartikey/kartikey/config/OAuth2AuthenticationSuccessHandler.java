@@ -29,51 +29,25 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
-
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
 
-        try {
-            String email = oAuth2User.getAttribute("email");
-            String name = oAuth2User.getAttribute("name");
-            String provider = getProvider(request);
-            String providerId = getProviderId(oAuth2User, provider);
+        String email = oAuth2User.getAttribute("email");
+        String name = oAuth2User.getAttribute("name");
 
-            log.info("OAuth2 login attempt - Provider: {}, Email: {}, Name: {}", provider, email, name);
+        UserEntity userEntity = userService.processOAuth2User("google", "googleId", email, name);
+        String token = jwtService.generateTokenWithUserDetails(userEntity);
 
-            // Process OAuth2 user (create or update)
-            UserEntity userEntity = userService.processOAuth2User(provider, providerId, email, name);
-
-            // Generate JWT token
-            String token = jwtService.generateTokenWithUserDetails(userEntity);
-
-            // Return JSON response similar to login endpoint
-            Map<String, Object> responseBody = new HashMap<>();
-            responseBody.put("token", token);
-            responseBody.put("type", "Bearer");
-            responseBody.put("id", userEntity.getId());
-            responseBody.put("username", userEntity.getUsername());
-            responseBody.put("email", userEntity.getEmail());
-            responseBody.put("role", userEntity.getRole().name());
-
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(responseBody));
-
-            log.info("OAuth2 authentication successful for user: {}", email);
-
-        } catch (Exception e) {
-            log.error("OAuth2 authentication failed", e);
-
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("error", "Authentication failed");
-            errorResponse.put("message", e.getMessage());
-
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            response.setContentType("application/json");
-            response.setCharacterEncoding("UTF-8");
-            response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
-        }
+        // ✅ Redirect directly to frontend with token
+        String redirectUrl = String.format(
+                "http://localhost:5173/oauth2/redirect"
+                        + "?token=" + token
+                        + "&email=" + userEntity.getEmail()
+                        + "&role=" + userEntity.getRole().name()
+        );
+        getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
+
+
 
     private String getProvider(HttpServletRequest request) {
         String uri = request.getRequestURI();
