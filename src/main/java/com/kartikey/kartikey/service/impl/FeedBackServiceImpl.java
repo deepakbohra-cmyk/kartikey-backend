@@ -1,10 +1,12 @@
 package com.kartikey.kartikey.service.impl;
 
+import com.kartikey.kartikey.dto.feedback.FeedBackDTO;
 import com.kartikey.kartikey.dto.feedback.FeedBackRequestDTO;
 import com.kartikey.kartikey.dto.feedback.FeedBackResponseDTO;
 import com.kartikey.kartikey.entity.FeedBack;
 import com.kartikey.kartikey.entity.FormData;
 import com.kartikey.kartikey.entity.UserEntity;
+import com.kartikey.kartikey.exception.ResourceNotFoundException;
 import com.kartikey.kartikey.repository.FeedBackRepository;
 import com.kartikey.kartikey.repository.FormDataRepository;
 import com.kartikey.kartikey.repository.UserRepository;
@@ -12,6 +14,8 @@ import com.kartikey.kartikey.service.EmailService;
 import com.kartikey.kartikey.service.FeedBackService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +62,39 @@ public class FeedBackServiceImpl implements FeedBackService {
         FeedBack savedFeedback = feedBackRepository.save(feedback);
 
         return FeedBackResponseDTO.fromEntity(savedFeedback);
+    }
+
+    @Override
+    public List<FeedBackDTO> getAllFeedbackForUser(String email) {
+        List<FeedBack> feedbackList = feedBackRepository.findAllByUserEmail(email);
+        return feedbackList.stream()
+                .map(FeedBackServiceImpl::toDTO) // mapper method
+                .toList();
+    }
+
+    public static FeedBackDTO toDTO(FeedBack feedback) {
+        return new FeedBackDTO(
+                feedback.getId(),
+                feedback.getStatus().name(),
+                feedback.getAgent().getEmail(),
+                feedback.getQcReviewer() != null ? feedback.getQcReviewer().getEmail() : null,
+                feedback.getTeamLead() != null ? feedback.getTeamLead().getEmail() : null,
+                feedback.getFormData().getWorkType(),
+                feedback.getFormData().getGid(),
+                feedback.getFormData().getDecision(),
+                feedback.getFormData().getCreatedAt().toLocalDate(),
+                feedback.getFormData().getCreatedAt().toLocalTime()
+        );
+    }
+
+    @Override
+    public FeedBackDTO changeStatus(String status, Long id) {
+        FeedBack feedback = feedBackRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id: " + id));
+
+        feedback.setStatus(FeedBack.Status.valueOf(status.toUpperCase())); // ensure valid enum
+        FeedBack updated = feedBackRepository.save(feedback);
+
+        return toDTO(updated);
     }
 }

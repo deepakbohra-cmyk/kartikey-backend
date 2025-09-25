@@ -16,19 +16,19 @@ public class FeedBack {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "form_id", nullable = false)
     private FormData formData;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "agent_id", nullable = false)
     private UserEntity agent;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "qc_id")
     private UserEntity qcReviewer;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "tl_id")
     private UserEntity teamLead;
 
@@ -46,8 +46,8 @@ public class FeedBack {
 
     public enum Status {
         OPEN,
-        CLOSED,
-        PENDING,
+        AGENTACTIONREQUIRED,
+        QAREVIEWPENDING,
         ACTION
     }
 }

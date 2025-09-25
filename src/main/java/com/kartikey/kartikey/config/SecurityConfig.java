@@ -87,6 +87,8 @@ public class SecurityConfig {
 
                         // User endpoints
                         .requestMatchers("/api/user/profile").authenticated()
+                        .requestMatchers("/api/feedback/**").permitAll()
+                        .requestMatchers("/api/super/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint))
