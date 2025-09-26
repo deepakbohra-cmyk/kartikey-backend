@@ -48,6 +48,6 @@ public class FeedBack {
         OPEN,
         AGENTACTIONREQUIRED,
         QAREVIEWPENDING,
-        ACTION
+        CLOSED
     }
 }

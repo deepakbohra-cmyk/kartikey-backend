@@ -5,21 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4c7545ab-523f-4fd9-b220-19deb8c42c64" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/SuperAdminController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/feedback/FeedBackDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/feedback/UpdateStatusRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/exception/ResourceNotFoundException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/BulkUploadService.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/BulkUploadServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/testdbm.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/testdbm.mv.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/config/SecurityConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/FeedBackController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/controller/FeedBackController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/testdbm.trace.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/testdbm.trace.db" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/KartikeyApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/KartikeyApplication.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FeedBack.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FeedBack.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/UserEntity.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/UserEntity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/repository/FeedBackRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/repository/FeedBackRepository.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/FeedBackService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/FeedBackService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/EmailService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/EmailServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/EmailServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FeedBackServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FeedBackServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />

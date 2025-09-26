@@ -61,6 +61,36 @@ public class FeedBackServiceImpl implements FeedBackService {
 
         FeedBack savedFeedback = feedBackRepository.save(feedback);
 
+        if (tl != null) {
+            String subject = "ACTION REQUIRED: New Feedback for GID" + formData.getGid() + "- Agent:" + agent.getEmail();
+
+            String body = "<div style=\"font-family: Arial, sans-serif; line-height: 1.6; color: #333;\">" +
+                    "<h2 style=\"color: #0056b3;\">New Feedback Alert!</h2>" +
+                    "<p>Dear Team Lead,</p>" +
+                    "<p>New feedback has been recorded for your agent. Please review the details below:</p>" +
+                    "<table border='1' cellpadding='5' cellspacing='0'>" +
+                    "<tr><td>Agent Email</td><td>" + agent.getEmail() + "</td></tr>" +
+                    "<tr><td>Form GID</td><td>" + formData.getGid() + "</td></tr>" +
+                    "<tr><td>Decision</td><td>" + formData.getDecision() + "</td></tr>" +
+                    "</table>" +
+                    "<p style=\"margin-top: 20px;\"><strong>Action Required:</strong></p>" +
+                    "<p>Please ensure <strong>" + agent.getEmail() + "</strong> discusses this feedback with QA <strong>" +
+                    (qc != null ? qc.getEmail() : "N/A") + "</strong>.</p>" +
+                    "<p>Once the feedback is resolved, click the link below to mark it as closed:</p>" +
+                    "<p style=\"text-align: center; margin-top: 25px;\">" +
+                    "<a href=\"http://localhost:5173/feedback\" " +
+                    "style=\"display: inline-block; padding: 12px 25px; background-color: #28a745; color: white; " +
+                    "text-decoration: none; border-radius: 5px; font-weight: bold;\">Confirm Feedback Closed</a>" +
+                    "</p>" +
+                    "<p style=\"margin-top: 30px;\">Thank you for your prompt attention.</p>" +
+                    "<p>Best regards,<br>The Glimpse Lens System</p>" +
+                    "</div>";
+
+            String[] cc = { "ritik.rana@vacobinary.in" };
+            emailService.sendFeedbackNotification(tl.getEmail(), cc, subject, body);
+        }
+
+
         return FeedBackResponseDTO.fromEntity(savedFeedback);
     }
 
