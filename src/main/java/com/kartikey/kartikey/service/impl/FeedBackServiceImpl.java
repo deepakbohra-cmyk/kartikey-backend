@@ -9,12 +9,17 @@ import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.exception.ResourceNotFoundException;
 import com.kartikey.kartikey.repository.FeedBackRepository;
 import com.kartikey.kartikey.repository.FormDataRepository;
+import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.repository.UserRepository;
 import com.kartikey.kartikey.service.EmailService;
 import com.kartikey.kartikey.service.FeedBackService;
+import com.kartikey.kartikey.service.UserMetricsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -25,8 +30,10 @@ public class FeedBackServiceImpl implements FeedBackService {
     private final UserRepository userRepository;
     private final FormDataRepository formDataRepository;
     private final EmailService emailService;
+    private final UserMetricsService userMetricsService;
 
     @Override
+    @Transactional
     public FeedBackResponseDTO createFeedback(FeedBackRequestDTO requestDTO) {
         feedBackRepository.findByFormDataId(requestDTO.getFormId())
                 .ifPresent(fb -> {
@@ -60,6 +67,11 @@ public class FeedBackServiceImpl implements FeedBackService {
                 .build();
 
         FeedBack savedFeedback = feedBackRepository.save(feedback);
+
+        userMetricsService.incrementFeedbackGiven(agent);
+        if (qc != null) {
+            userMetricsService.incrementFeedbackGiven(qc);
+        }
 
         if (tl != null) {
             String subject = "ACTION REQUIRED: New Feedback for GID" + formData.getGid() + "- Agent:" + agent.getEmail();
@@ -126,5 +138,18 @@ public class FeedBackServiceImpl implements FeedBackService {
         FeedBack updated = feedBackRepository.save(feedback);
 
         return toDTO(updated);
+    }
+
+    @Scheduled(cron = "0 0 2 * * ?")
+    public void deleteOldClosedFeedback() {
+        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
+
+        List<FeedBack> oldClosedFeedbacks = feedBackRepository
+                .findByStatusAndUpdatedAtBefore(FeedBack.Status.CLOSED, oneWeekAgo);
+
+        if (!oldClosedFeedbacks.isEmpty()) {
+            feedBackRepository.deleteAll(oldClosedFeedbacks);
+            System.out.println(oldClosedFeedbacks.size() + " old CLOSED feedback deleted.");
+        }
     }
 }

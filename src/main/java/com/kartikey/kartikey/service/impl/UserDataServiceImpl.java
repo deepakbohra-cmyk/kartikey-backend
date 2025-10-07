@@ -3,11 +3,14 @@ package com.kartikey.kartikey.service.impl;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
 import com.kartikey.kartikey.entity.UserEntity;
+import com.kartikey.kartikey.entity.UserMetrics;
+import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.repository.UserRepository;
 import com.kartikey.kartikey.service.UserDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +21,7 @@ public class UserDataServiceImpl implements UserDataService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMetricsRepository userMetricsRepository;
 
     @Override
     public List<UserDTO> getAllUser() {
@@ -35,6 +39,7 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
+    @Transactional
     public UserDTO addUser(UserEntityDTO userEntityDTO) {
         if (userRepository.existsByEmail(userEntityDTO.getEmail())) {
             throw new RuntimeException("User with email " + userEntityDTO.getEmail() + " already exists");
@@ -50,6 +55,11 @@ public class UserDataServiceImpl implements UserDataService {
                 .build();
 
         UserEntity saved = userRepository.save(user);
+
+        UserMetrics userMetrics = UserMetrics.builder()
+                .user(saved)
+                .build();
+        userMetricsRepository.save(userMetrics);
 
         return new UserDTO(
                 saved.getId(),

@@ -2,8 +2,10 @@ package com.kartikey.kartikey.controller;
 
 import com.kartikey.kartikey.dto.formdata.FormDataDTO;
 import com.kartikey.kartikey.dto.formdata.FormDataFilterDTO;
+import com.kartikey.kartikey.dto.formdata.QcFormDataDTO;
 import com.kartikey.kartikey.entity.FormData;
 import com.kartikey.kartikey.service.FormDataService;
+import com.kartikey.kartikey.service.QcFormDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,6 +23,9 @@ public class QcTeamController {
 
     @Autowired
     private FormDataService formDataService;
+
+    @Autowired
+    private QcFormDataService qcFormDataService;
 
     @GetMapping
     public ResponseEntity<?> getForms(
@@ -53,6 +58,11 @@ public class QcTeamController {
     @GetMapping("/gid")
     public ResponseEntity<List<FormDataDTO>> searchByGid(@RequestParam String gid) {
         return ResponseEntity.ok(formDataService.searchByGid(gid));
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<QcFormDataDTO> createForm(@RequestBody QcFormDataDTO qcFormDataDTO) {
+        return ResponseEntity.ok(qcFormDataService.saveQcFormData(qcFormDataDTO));
     }
 
 }

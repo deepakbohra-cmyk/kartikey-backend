@@ -5,6 +5,7 @@ import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.repository.FormDataRepository;
 import com.kartikey.kartikey.repository.UserRepository;
 import com.kartikey.kartikey.service.BulkUploadService;
+import com.kartikey.kartikey.service.UserMetricsService;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
     private final UserRepository userRepository;
     private final FormDataRepository formDataRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserMetricsService userMetricsService; // ✅ inject service
 
     @Override
     public String uploadUsers(MultipartFile file) {
@@ -39,13 +41,8 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 String email = getCellValue(row.getCell(2));
                 if (email == null) continue;
 
-                // check if email already exists in DB
-                if (userRepository.findByEmail(email).isPresent()) {
-                    // skip duplicates
-                    continue;
-                }
-
-                // also check within the current batch (Excel might have duplicate emails)
+                // skip duplicates
+                if (userRepository.findByEmail(email).isPresent()) continue;
                 boolean alreadyInBatch = users.stream()
                         .anyMatch(u -> email.equalsIgnoreCase(u.getEmail()));
                 if (alreadyInBatch) continue;
@@ -66,12 +63,10 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
             if (!users.isEmpty()) {
                 userRepository.saveAll(users);
+
+                users.forEach(userMetricsService::ensureMetrics);
             }
 
-
-            if (!users.isEmpty()) {
-                userRepository.saveAll(users);
-            }
             return "Successfully uploaded " + users.size() + " users.";
 
         } catch (IOException e) {
@@ -87,7 +82,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             Sheet sheet = workbook.getSheetAt(0);
             List<FormData> forms = new ArrayList<>();
 
-            for (int i = 1; i <= sheet.getLastRowNum(); i++) { // skip header row
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
@@ -103,7 +98,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
                 FormData form = FormData.builder()
                         .email(getCellValue(row.getCell(0)))
-                        .workType(workType)  // safe assignment
+                        .workType(workType)
                         .gid(getCellValue(row.getCell(2)))
                         .decision(getCellValue(row.getCell(3)))
                         .build();
@@ -111,7 +106,16 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 forms.add(form);
             }
 
-            formDataRepository.saveAll(forms);
+            if (!forms.isEmpty()) {
+                formDataRepository.saveAll(forms);
+
+                // ✅ Increment 'formFilled' metric for each user (by email)
+                forms.forEach(f -> {
+                    userRepository.findByEmail(f.getEmail())
+                            .ifPresent(userMetricsService::incrementFormFilled);
+                });
+            }
+
             return "Successfully uploaded " + forms.size() + " forms.";
 
         } catch (IOException e) {
@@ -127,7 +131,8 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             case NUMERIC -> String.valueOf((long) cell.getNumericCellValue());
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
             case BLANK -> null;
-            default -> null; // handles FORMULA, ERROR, etc.
+            default -> null;
         };
     }
 }
+

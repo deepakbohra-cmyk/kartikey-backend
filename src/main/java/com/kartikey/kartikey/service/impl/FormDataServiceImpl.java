@@ -3,17 +3,19 @@ package com.kartikey.kartikey.service.impl;
 
 import com.kartikey.kartikey.dto.formdata.FormDataDTO;
 import com.kartikey.kartikey.dto.formdata.FormDataFilterDTO;
-import com.kartikey.kartikey.entity.FormData;
-import com.kartikey.kartikey.entity.UserEntity;
-import com.kartikey.kartikey.repository.FormDataRepository;
-import com.kartikey.kartikey.repository.UserRepository;
+import com.kartikey.kartikey.dto.formdata.QcFormDataDTO;
+import com.kartikey.kartikey.entity.*;
+import com.kartikey.kartikey.repository.*;
 import com.kartikey.kartikey.service.FormDataService;
+import com.kartikey.kartikey.service.UserMetricsService;
 import com.kartikey.kartikey.specification.FormDataSpecification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,18 +27,17 @@ import java.util.stream.Collectors;
 public class FormDataServiceImpl implements FormDataService {
 
     private final FormDataRepository formDataRepository;
-
+    private final FeedBackRepository feedBackRepository;
     private final UserRepository userRepository;
+    private final UserMetricsService userMetricsService;
 
     @Override
+    @Transactional
     public FormDataDTO saveFormData(FormDataDTO formDataDTO) {
 
-        // Check if the email belongs to L1 team
-        Optional<UserEntity> l1User = userRepository.findByEmailAndRole(formDataDTO.getEmail(), UserEntity.Role.L1TEAM);
-
-        if (l1User.isEmpty()) {
-            throw new RuntimeException("Email " + formDataDTO.getEmail() + " is not in L1 team");
-        }
+        UserEntity l1User = userRepository.findByEmailAndRole(
+                        formDataDTO.getEmail(), UserEntity.Role.L1TEAM)
+                .orElseThrow(() -> new RuntimeException("Email " + formDataDTO.getEmail() + " is not in L1 team"));
 
         FormData formData = FormData.builder()
                 .id(formDataDTO.getId())
@@ -48,7 +49,18 @@ public class FormDataServiceImpl implements FormDataService {
                 .build();
 
         FormData saved = formDataRepository.save(formData);
+
+        userMetricsService.incrementFormFilled(l1User);
+
         return mapToDTO(saved);
+    }
+
+    @Override
+    public List<FormDataDTO> searchByGid(String gid) {
+        return formDataRepository.findBySimilarGid(gid)
+                .stream()
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -78,12 +90,19 @@ public class FormDataServiceImpl implements FormDataService {
                 .build();
     }
 
-    @Override
-    public List<FormDataDTO> searchByGid(String gid) {
-        return formDataRepository.findBySimilarGid(gid)
-                .stream()
-                .map(this::mapToDTO)
-                .collect(Collectors.toList());
+    @Scheduled(cron = "0 0 3 * * ?")
+    public void deleteOldFormData() {
+        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
+
+        List<FormData> oldForms = formDataRepository.findByCreatedAtBefore(twoWeeksAgo);
+
+        for (FormData form : oldForms) {
+            boolean hasOpenFeedback = feedBackRepository.existsByFormDataAndStatusNot(form, FeedBack.Status.CLOSED);
+
+            if (!hasOpenFeedback) {
+                formDataRepository.delete(form);
+            }
+        }
     }
 
 }

@@ -1,11 +1,14 @@
 package com.kartikey.kartikey.repository;
 
 import com.kartikey.kartikey.entity.FeedBack;
+import com.kartikey.kartikey.entity.FeedBack.Status;
+import com.kartikey.kartikey.entity.FormData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,4 +24,8 @@ public interface FeedBackRepository extends JpaRepository<FeedBack, Long> {
             "OR f.qcReviewer.email = :email " +
             "OR f.teamLead.email = :email")
     List<FeedBack> findAllByUserEmail(@Param("email") String email);
+
+    List<FeedBack> findByStatusAndUpdatedAtBefore(Status status, LocalDateTime dateTime);
+
+    boolean existsByFormDataAndStatusNot(FormData formData, FeedBack.Status status);
 }
