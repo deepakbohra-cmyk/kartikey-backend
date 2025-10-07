@@ -70,4 +70,8 @@ public class QcTeamController {
         return ResponseEntity.ok(qcFormDataService.getQcForms(email));
     }
 
+    @GetMapping("/id")
+    public ResponseEntity<FormDataDTO> getFormById(@RequestParam Long id ) {
+        return ResponseEntity.ok(formDataService.getFormById(id));
+    }
 }
