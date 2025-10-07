@@ -65,4 +65,9 @@ public class QcTeamController {
         return ResponseEntity.ok(qcFormDataService.saveQcFormData(qcFormDataDTO));
     }
 
+    @GetMapping("/qcforms")
+    public ResponseEntity<?> getQcForms(@RequestParam String email) {
+        return ResponseEntity.ok(qcFormDataService.getQcForms(email));
+    }
+
 }

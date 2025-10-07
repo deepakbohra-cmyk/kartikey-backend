@@ -1,6 +1,7 @@
 package com.kartikey.kartikey.service.impl;
 
 import com.kartikey.kartikey.dto.formdata.QcFormDataDTO;
+import com.kartikey.kartikey.dto.formdata.QcFormDataFilterDTO;
 import com.kartikey.kartikey.entity.FormData;
 import com.kartikey.kartikey.entity.QcFormData;
 import com.kartikey.kartikey.entity.UserEntity;
@@ -10,12 +11,16 @@ import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.repository.UserRepository;
 import com.kartikey.kartikey.service.QcFormDataService;
 import com.kartikey.kartikey.service.UserMetricsService;
+import com.kartikey.kartikey.specification.QcFormDataSpecification;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +74,30 @@ public class QcFormDataServiceImpl implements QcFormDataService {
                 .date(qcFormData.getCreatedAt() != null ? qcFormData.getCreatedAt().toLocalDate() : null)
                 .time(qcFormData.getCreatedAt() != null ? qcFormData.getCreatedAt().toLocalTime() : null)
                 .build();
+    }
+
+    @Override
+    public Page<QcFormDataDTO> getForms(QcFormDataFilterDTO filter, Pageable pageable) {
+        Specification<QcFormData> spec = QcFormDataSpecification.withFilters(filter);
+
+        Page<QcFormData> page = qcFormDataRepository.findAll(
+                spec.and((root, query, cb) -> root.get("email").in(
+                        userRepository.findAll().stream()
+                                .filter(u -> u.getRole() == UserEntity.Role.QCTEAM || u.getRole() == UserEntity.Role.ADMIN)
+                                .map(UserEntity::getEmail)
+                                .toList()
+                )),
+                pageable
+        );
+
+        return page.map(this::mapToQcDTO);
+    }
+
+    @Override
+    public List<QcFormDataDTO> getQcForms(String email) {
+        return qcFormDataRepository.findByEmailOrderByCreatedAtDesc(email) // latest first
+                .stream()
+                .map(this::mapToQcDTO)
+                .toList();
     }
 }

@@ -67,8 +67,17 @@ public class FormDataServiceImpl implements FormDataService {
     public Page<FormDataDTO> getForms(FormDataFilterDTO filter, Pageable pageable) {
         Specification<FormData> spec = FormDataSpecification.withFilters(filter);
 
-        return formDataRepository.findAll(spec, pageable)
-                .map(this::mapToDTO);
+        Page<FormData> page = formDataRepository.findAll(
+                spec.and((root, query, cb) -> root.get("email").in(
+                        userRepository.findAll().stream()
+                                .filter(u -> u.getRole() == UserEntity.Role.L1TEAM)
+                                .map(UserEntity::getEmail)
+                                .toList()
+                )),
+                pageable
+        );
+
+        return page.map(this::mapToDTO);
     }
 
     @Override
