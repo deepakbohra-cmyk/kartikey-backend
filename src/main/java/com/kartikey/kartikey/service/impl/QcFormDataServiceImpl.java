@@ -34,12 +34,15 @@ public class QcFormDataServiceImpl implements QcFormDataService {
     @Override
     @Transactional
     public QcFormDataDTO saveQcFormData(QcFormDataDTO qcFormDataDTO) {
-        UserEntity qcUser = userRepository.findByEmailAndRole(
-                        qcFormDataDTO.getEmail(), UserEntity.Role.QCTEAM)
-                .orElseThrow(() -> new RuntimeException("Email " + qcFormDataDTO.getEmail() + " is not in QC team"));
+        UserEntity qcUser = userRepository.findByEmailAndRoleIn(
+                qcFormDataDTO.getEmail(),
+                List.of(UserEntity.Role.QCTEAM, UserEntity.Role.ADMIN)
+        ).orElseThrow(() -> new RuntimeException(
+                "Email " + qcFormDataDTO.getEmail() + " is not in QC team or ADMIN"));
 
-        FormData formData = formDataRepository.findById(qcFormDataDTO.getFormId().getId())
-                .orElseThrow(() -> new RuntimeException("Form not found with id " + qcFormDataDTO.getFormId().getId()));
+
+        FormData formData = formDataRepository.findById(qcFormDataDTO.getFormId())
+                .orElseThrow(() -> new RuntimeException("Form not found with id " + qcFormDataDTO.getFormId()));
 
         QcFormData qcFormData = QcFormData.builder()
                 .formId(formData)
@@ -66,7 +69,7 @@ public class QcFormDataServiceImpl implements QcFormDataService {
     private QcFormDataDTO mapToQcDTO(QcFormData qcFormData) {
         return QcFormDataDTO.builder()
                 .id(qcFormData.getId())
-                .formId(qcFormData.getFormId())
+                .formId(qcFormData.getFormId() != null ? qcFormData.getFormId().getId() : null) // ✅ only ID
                 .email(qcFormData.getEmail())
                 .workType(qcFormData.getWorkType())
                 .gid(qcFormData.getGid())

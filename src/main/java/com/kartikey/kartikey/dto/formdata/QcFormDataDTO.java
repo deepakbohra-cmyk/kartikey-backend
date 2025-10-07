@@ -16,7 +16,7 @@ import java.time.LocalTime;
 @Builder
 public class QcFormDataDTO {
     private Long id;
-    private FormData formId;
+    private Long formId;
     private String email;
     private QcFormData.WorkType workType;
     private String gid;
