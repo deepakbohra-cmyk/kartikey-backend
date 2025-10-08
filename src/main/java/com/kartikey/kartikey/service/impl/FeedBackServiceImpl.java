@@ -98,8 +98,8 @@ public class FeedBackServiceImpl implements FeedBackService {
                     "<p>Best regards,<br>The Glimpse Lens System</p>" +
                     "</div>";
 
-            String[] cc = { "ritik.rana@vacobinary.in" };
-            emailService.sendFeedbackNotification(tl.getEmail(), cc, subject, body);
+            String[] cc = { agent.getEmail() , tl.getEmail() };
+            emailService.sendFeedbackNotification(qc.getEmail(), cc, subject, body);
         }
 
 
