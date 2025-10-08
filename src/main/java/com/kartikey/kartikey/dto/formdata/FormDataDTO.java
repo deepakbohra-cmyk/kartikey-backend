@@ -18,4 +18,5 @@ public class FormDataDTO {
     private String decision;
     private LocalDate date;
     private LocalTime time;
+    private boolean checked;
 }

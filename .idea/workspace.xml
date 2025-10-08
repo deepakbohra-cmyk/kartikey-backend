@@ -7,8 +7,8 @@
     <list default="true" id="4c7545ab-523f-4fd9-b220-19deb8c42c64" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/testdbm.mv.db" beforeDir="false" afterPath="$PROJECT_DIR$/data/testdbm.mv.db" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FormData.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/entity/FormData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/QcFormDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/QcFormDataServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/formdata/FormDataDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/dto/formdata/FormDataDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FormDataServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/kartikey/kartikey/service/impl/FormDataServiceImpl.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
