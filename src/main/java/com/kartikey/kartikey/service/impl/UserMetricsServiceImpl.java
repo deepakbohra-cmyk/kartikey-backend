@@ -1,15 +1,23 @@
 package com.kartikey.kartikey.service.impl;
 
+import com.kartikey.kartikey.dto.metric.UserMetricsDTO;
 import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
 import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.service.UserMetricsService;
+import com.kartikey.kartikey.specification.UserMetricSpecification;
 import jakarta.persistence.OptimisticLockException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -120,5 +128,31 @@ public class UserMetricsServiceImpl implements UserMetricsService {
             }
         }, "increment TL score", user.getEmail());
         log.debug("✅ TL score incremented by {} for {}", delta, user.getEmail());
+    }
+
+    @Override
+    public Page<UserMetricsDTO> getAllMetrics(String email, Pageable pageable) {
+        return userMetricsRepository.findAll(UserMetricSpecification.withEmail(email), pageable)
+                .map(this::mapToDto);
+    }
+
+
+    private UserMetricsDTO mapToDto(UserMetrics userMetrics) {
+        if (userMetrics == null || userMetrics.getUser() == null) {
+            return null;
+        }
+
+        return UserMetricsDTO.builder()
+                .id(userMetrics.getId())
+                .userEmail(userMetrics.getUser().getEmail())
+                .userName(userMetrics.getUser().getUsername())
+                .role(userMetrics.getUser().getRole().name())
+                .formFilled(userMetrics.getFormFilled())
+                .formChecked(userMetrics.getFormChecked())
+                .feedbackGiven(userMetrics.getFeedbackGiven())
+                .score(userMetrics.getScore())
+                .tlScore(userMetrics.getTlScore())
+                .updatedAt(userMetrics.getUpdatedAt())
+                .build();
     }
 }

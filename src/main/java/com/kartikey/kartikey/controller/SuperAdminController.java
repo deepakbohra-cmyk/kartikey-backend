@@ -5,6 +5,7 @@ import com.kartikey.kartikey.dto.formdata.QcFormDataFilterDTO;
 import com.kartikey.kartikey.entity.QcFormData;
 import com.kartikey.kartikey.service.BulkUploadService;
 import com.kartikey.kartikey.service.QcFormDataService;
+import com.kartikey.kartikey.service.UserMetricsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ public class SuperAdminController {
 
     private final BulkUploadService bulkUploadService;
     private final QcFormDataService qcFormDataService;
+    private final UserMetricsService userMetricsService;
 
     @PostMapping("/users")
     public ResponseEntity<String> uploadUsers(@RequestParam("file") MultipartFile file) {
@@ -62,4 +64,20 @@ public class SuperAdminController {
         List<QcFormDataDTO> forms = qcFormDataService.getForms(filter, pageable).getContent();
         return ResponseEntity.ok(forms);
     }
+
+    @GetMapping("/allmetric")
+    public ResponseEntity<?> getAllMetrics(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(required = false) String email) {
+
+        if (!(size == 50 || size == 100 || size == 200 || size == 500)) {
+            size = 50;
+        }
+
+        Pageable pageable = PageRequest.of(page, size);
+        return ResponseEntity.ok(userMetricsService.getAllMetrics(email, pageable));
+    }
+
+
 }

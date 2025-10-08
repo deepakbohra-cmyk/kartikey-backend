@@ -3,6 +3,7 @@ package com.kartikey.kartikey.repository;
 import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Repository
-public interface UserMetricsRepository extends JpaRepository<UserMetrics , Long> {
+public interface UserMetricsRepository extends JpaRepository<UserMetrics , Long> , JpaSpecificationExecutor<UserMetrics> {
 
     Optional<UserMetrics> findByUser(UserEntity user);
 
