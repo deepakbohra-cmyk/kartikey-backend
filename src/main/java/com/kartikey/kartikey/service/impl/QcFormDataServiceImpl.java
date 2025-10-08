@@ -44,6 +44,9 @@ public class QcFormDataServiceImpl implements QcFormDataService {
         FormData formData = formDataRepository.findById(qcFormDataDTO.getFormId())
                 .orElseThrow(() -> new RuntimeException("Form not found with id " + qcFormDataDTO.getFormId()));
 
+        formData.setChecked(true);
+        formDataRepository.save(formData);
+
         QcFormData qcFormData = QcFormData.builder()
                 .formId(formData)
                 .email(qcFormDataDTO.getEmail())

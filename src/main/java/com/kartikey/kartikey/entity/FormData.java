@@ -31,6 +31,9 @@ public class FormData {
     @Column(nullable = false)
     private String decision;
 
+    @Column(name="checked" , nullable = false)
+    private boolean checked  = false;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
