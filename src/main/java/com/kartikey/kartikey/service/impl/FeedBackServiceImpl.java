@@ -9,7 +9,6 @@ import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.exception.ResourceNotFoundException;
 import com.kartikey.kartikey.repository.FeedBackRepository;
 import com.kartikey.kartikey.repository.FormDataRepository;
-import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.repository.UserRepository;
 import com.kartikey.kartikey.service.EmailService;
 import com.kartikey.kartikey.service.FeedBackService;
@@ -73,6 +72,8 @@ public class FeedBackServiceImpl implements FeedBackService {
             userMetricsService.incrementFeedbackGiven(qc);
         }
 
+        String decision = formData.getDecision();
+
         if (tl != null) {
             String subject = "ACTION REQUIRED: New Feedback for GID" + formData.getGid() + "- Agent:" + agent.getEmail();
 
@@ -83,7 +84,7 @@ public class FeedBackServiceImpl implements FeedBackService {
                     "<table border='1' cellpadding='5' cellspacing='0'>" +
                     "<tr><td>Agent Email</td><td>" + agent.getEmail() + "</td></tr>" +
                     "<tr><td>Form GID</td><td>" + formData.getGid() + "</td></tr>" +
-                    "<tr><td>QC Decision</td><td>" + formData.getDecision() + "</td></tr>" +
+                    "<tr><td>Agent Decision</td><td>" + decision + "</td></tr>" +
                     "<tr><td>QC Decision</td><td>" + requestDTO.getDecision() + "</td></tr>" +
                     "</table>" +
                     "<p style=\"margin-top: 20px;\"><strong>Action Required:</strong></p>" +

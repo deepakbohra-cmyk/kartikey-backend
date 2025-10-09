@@ -72,10 +72,10 @@ public class QcFormDataServiceImpl implements QcFormDataService {
         if (!qcFormDataDTO.getDecision().equals(formData.getDecision())) {
             feedBackService.createFeedback(
                     FeedBackRequestDTO.builder()
-                            .formId(qcFormData.getId())
+                            .formId(formData.getId())
                             .agentEmail(formData.getEmail())
                             .qcEmail(qcFormDataDTO.getEmail())
-                            .decision(formData.getDecision())
+                            .decision(qcFormData.getDecision())
                             .build()
             );
         }

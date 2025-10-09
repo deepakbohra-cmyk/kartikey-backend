@@ -1,5 +1,6 @@
 package com.kartikey.kartikey.service.impl;
 
+import com.kartikey.kartikey.dto.user.ChangePasswordRequest;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
 import com.kartikey.kartikey.entity.UserEntity;
@@ -137,6 +138,29 @@ public class UserDataServiceImpl implements UserDataService {
                         user.getLocation()
                 ))
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+    }
+
+    @Override
+    public void changePassword(ChangePasswordRequest request) {
+        UserEntity user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found with email " + request.getEmail()));
+
+        if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
+            throw new RuntimeException("Old password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        userRepository.save(user);
+    }
+
+    @Override
+    public void resetPassword(String email) {
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email " + email));
+
+        String defaultPassword = "#*pass12*#";
+        user.setPassword(passwordEncoder.encode(defaultPassword));
+        userRepository.save(user);
     }
 
 }

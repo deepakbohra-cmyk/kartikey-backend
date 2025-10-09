@@ -1,5 +1,7 @@
 package com.kartikey.kartikey.controller;
 
+import com.kartikey.kartikey.dto.user.ChangePasswordRequest;
+import com.kartikey.kartikey.dto.user.ResetPasswordRequest;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
 import com.kartikey.kartikey.service.UserDataService;
@@ -63,4 +65,29 @@ public class UserController {
             return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
         }
     }
+
+    @PostMapping("/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordRequest request) {
+        try {
+            userDataService.changePassword(request);
+            return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest request) {
+        try {
+            userDataService.resetPassword(request.getEmail());
+            return ResponseEntity.ok(Map.of(
+                    "message", "Password has been reset successfully to default",
+                    "newPassword", "#*pass12*#"
+            ));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
+
 }

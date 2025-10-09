@@ -1,5 +1,6 @@
 package com.kartikey.kartikey.service;
 
+import com.kartikey.kartikey.dto.user.ChangePasswordRequest;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
 
@@ -11,4 +12,6 @@ public interface UserDataService {
     UserDTO updateUser(Long id, UserEntityDTO userEntityDTO);  // नया method
     void deleteUser(Long id);
     UserDTO getUserById(Long id);
+    void changePassword(ChangePasswordRequest request);
+    void resetPassword(String email);
 }
