@@ -1,7 +1,10 @@
 package com.kartikey.kartikey.repository;
 
+import com.kartikey.kartikey.dto.metric.UserMetricsDTO;
 import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;

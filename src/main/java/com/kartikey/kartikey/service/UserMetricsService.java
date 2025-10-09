@@ -17,5 +17,5 @@ public interface UserMetricsService {
     void incrementTlScore(UserEntity user, double delta);
     UserMetrics ensureMetrics(UserEntity user);
 
-    Page<UserMetricsDTO> getAllMetrics(String email, Pageable pageable);
+    Page<UserMetricsDTO> getAllMetrics(String email,UserEntity.Role role , Pageable pageable);
 }

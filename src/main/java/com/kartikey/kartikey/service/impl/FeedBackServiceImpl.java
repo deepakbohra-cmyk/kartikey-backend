@@ -98,7 +98,7 @@ public class FeedBackServiceImpl implements FeedBackService {
                     "<p>Best regards,<br>The Glimpse Lens System</p>" +
                     "</div>";
 
-            String[] cc = { agent.getEmail() , tl.getEmail() };
+            String[] cc = { "ritik.rana@vacobinary.in" };
             emailService.sendFeedbackNotification(qc.getEmail(), cc, subject, body);
         }
 

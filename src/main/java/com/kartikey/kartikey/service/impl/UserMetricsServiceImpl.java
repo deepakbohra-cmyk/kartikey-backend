@@ -131,8 +131,15 @@ public class UserMetricsServiceImpl implements UserMetricsService {
     }
 
     @Override
-    public Page<UserMetricsDTO> getAllMetrics(String email, Pageable pageable) {
-        return userMetricsRepository.findAll(UserMetricSpecification.withEmail(email), pageable)
+    public Page<UserMetricsDTO> getAllMetrics(String email, UserEntity.Role role, Pageable pageable) {
+        Specification<UserMetrics> spec = UserMetricSpecification.withEmail(email);
+
+        // ✅ role filter lagana
+        if (role != null) {
+            spec = spec.and(UserMetricSpecification.withRole(role));
+        }
+
+        return userMetricsRepository.findAll(spec, pageable)
                 .map(this::mapToDto);
     }
 

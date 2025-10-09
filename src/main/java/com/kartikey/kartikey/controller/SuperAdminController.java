@@ -3,6 +3,7 @@ package com.kartikey.kartikey.controller;
 import com.kartikey.kartikey.dto.formdata.QcFormDataDTO;
 import com.kartikey.kartikey.dto.formdata.QcFormDataFilterDTO;
 import com.kartikey.kartikey.entity.QcFormData;
+import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.service.BulkUploadService;
 import com.kartikey.kartikey.service.QcFormDataService;
 import com.kartikey.kartikey.service.UserMetricsService;
@@ -69,14 +70,15 @@ public class SuperAdminController {
     public ResponseEntity<?> getAllMetrics(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size,
-            @RequestParam(required = false) String email) {
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) UserEntity.Role role) {
 
         if (!(size == 50 || size == 100 || size == 200 || size == 500)) {
             size = 50;
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        return ResponseEntity.ok(userMetricsService.getAllMetrics(email, pageable));
+        return ResponseEntity.ok(userMetricsService.getAllMetrics(email, role, pageable));
     }
 
 

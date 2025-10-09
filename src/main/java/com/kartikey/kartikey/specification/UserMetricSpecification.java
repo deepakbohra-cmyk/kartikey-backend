@@ -1,5 +1,6 @@
 package com.kartikey.kartikey.specification;
 
+import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -13,5 +14,14 @@ public class UserMetricSpecification {
             return cb.like(cb.lower(root.join("user").get("email")), "%" + email.toLowerCase() + "%");
         };
 
+    }
+
+    public static Specification<UserMetrics> withRole(UserEntity.Role role) {
+        return (root, query, cb) -> {
+            if (role == null) {
+                return cb.conjunction();
+            }
+            return cb.equal(root.join("user").get("role"), role);
+        };
     }
 }
