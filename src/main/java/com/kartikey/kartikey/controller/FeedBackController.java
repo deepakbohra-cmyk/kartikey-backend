@@ -21,11 +21,6 @@ public class FeedBackController {
 
     private final FeedBackService feedBackService;
 
-    @PostMapping
-    public ResponseEntity<FeedBackResponseDTO> createFeedback(@RequestBody FeedBackRequestDTO dto) {
-        return ResponseEntity.ok(feedBackService.createFeedback(dto));
-    }
-
     @GetMapping("/getall")
     public ResponseEntity<List<FeedBackDTO>> getMyFeedback(Authentication authentication) {
         String email = authentication.getName();

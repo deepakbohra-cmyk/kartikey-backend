@@ -63,7 +63,7 @@ public class FeedBackServiceImpl implements FeedBackService {
                 .agent(agent)
                 .qcReviewer(qc)
                 .teamLead(tl)
-                .status(FeedBack.Status.OPEN) // Default OPEN
+                .status(FeedBack.Status.OPEN)
                 .build();
 
         FeedBack savedFeedback = feedBackRepository.save(feedback);
@@ -83,7 +83,8 @@ public class FeedBackServiceImpl implements FeedBackService {
                     "<table border='1' cellpadding='5' cellspacing='0'>" +
                     "<tr><td>Agent Email</td><td>" + agent.getEmail() + "</td></tr>" +
                     "<tr><td>Form GID</td><td>" + formData.getGid() + "</td></tr>" +
-                    "<tr><td>Decision</td><td>" + formData.getDecision() + "</td></tr>" +
+                    "<tr><td>QC Decision</td><td>" + formData.getDecision() + "</td></tr>" +
+                    "<tr><td>QC Decision</td><td>" + requestDTO.getDecision() + "</td></tr>" +
                     "</table>" +
                     "<p style=\"margin-top: 20px;\"><strong>Action Required:</strong></p>" +
                     "<p>Please ensure <strong>" + agent.getEmail() + "</strong> discusses this feedback with QA <strong>" +

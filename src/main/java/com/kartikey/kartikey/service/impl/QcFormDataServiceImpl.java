@@ -1,5 +1,6 @@
 package com.kartikey.kartikey.service.impl;
 
+import com.kartikey.kartikey.dto.feedback.FeedBackRequestDTO;
 import com.kartikey.kartikey.dto.formdata.QcFormDataDTO;
 import com.kartikey.kartikey.dto.formdata.QcFormDataFilterDTO;
 import com.kartikey.kartikey.entity.FormData;
@@ -9,6 +10,7 @@ import com.kartikey.kartikey.repository.FormDataRepository;
 import com.kartikey.kartikey.repository.QcFormDataRepository;
 import com.kartikey.kartikey.repository.UserMetricsRepository;
 import com.kartikey.kartikey.repository.UserRepository;
+import com.kartikey.kartikey.service.FeedBackService;
 import com.kartikey.kartikey.service.QcFormDataService;
 import com.kartikey.kartikey.service.UserMetricsService;
 import com.kartikey.kartikey.specification.QcFormDataSpecification;
@@ -30,6 +32,7 @@ public class QcFormDataServiceImpl implements QcFormDataService {
     private final FormDataRepository formDataRepository;
     private final UserRepository userRepository;
     private final UserMetricsService userMetricsService;
+    private final FeedBackService feedBackService;
 
     @Override
     @Transactional
@@ -40,10 +43,10 @@ public class QcFormDataServiceImpl implements QcFormDataService {
         ).orElseThrow(() -> new RuntimeException(
                 "Email " + qcFormDataDTO.getEmail() + " is not in QC team or ADMIN"));
 
-
         FormData formData = formDataRepository.findById(qcFormDataDTO.getFormId())
                 .orElseThrow(() -> new RuntimeException("Form not found with id " + qcFormDataDTO.getFormId()));
 
+        // ✅ Save the QC form
         formData.setChecked(true);
         formDataRepository.save(formData);
 
@@ -65,6 +68,18 @@ public class QcFormDataServiceImpl implements QcFormDataService {
                 .orElseThrow(() -> new RuntimeException("L1 user not found for email " + l1Email));
 
         userMetricsService.incrementFormChecked(l1User);
+
+        if (!qcFormDataDTO.getDecision().equals(formData.getDecision())) {
+            feedBackService.createFeedback(
+                    FeedBackRequestDTO.builder()
+                            .formId(qcFormData.getId())
+                            .agentEmail(formData.getEmail())
+                            .qcEmail(qcFormDataDTO.getEmail())
+                            .decision(formData.getDecision())
+                            .build()
+            );
+        }
+
         return mapToQcDTO(saved);
     }
 
