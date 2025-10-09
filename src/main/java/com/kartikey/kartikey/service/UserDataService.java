@@ -10,4 +10,5 @@ public interface UserDataService {
     UserDTO addUser(UserEntityDTO userEntityDTO);
     UserDTO updateUser(Long id, UserEntityDTO userEntityDTO);  // नया method
     void deleteUser(Long id);
+    UserDTO getUserById(Long id);
 }

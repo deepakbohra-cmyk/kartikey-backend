@@ -125,4 +125,18 @@ public class UserDataServiceImpl implements UserDataService {
         userRepository.deleteById(id);
     }
 
+    @Override
+    public UserDTO getUserById(Long id) {
+        return userRepository.findById(id)
+                .map(user -> new UserDTO(
+                        user.getId(),
+                        user.getUsername(),
+                        user.getEmail(),
+                        user.getRole().name(),
+                        user.getTlEmail(),
+                        user.getLocation()
+                ))
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+    }
+
 }
