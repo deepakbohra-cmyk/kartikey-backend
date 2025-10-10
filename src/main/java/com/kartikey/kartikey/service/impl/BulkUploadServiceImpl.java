@@ -12,8 +12,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,8 +28,64 @@ public class BulkUploadServiceImpl implements BulkUploadService {
     private final PasswordEncoder passwordEncoder;
     private final UserMetricsService userMetricsService;
 
-    @Override
-    public String uploadUsers(MultipartFile file) {
+    private String uploadUsersFromCSV(MultipartFile file) {
+        try (InputStream is = file.getInputStream();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(is))) {
+
+            String line;
+            List<UserEntity> users = new ArrayList<>();
+            int rowNum = 0;
+
+            while ((line = reader.readLine()) != null) {
+                rowNum++;
+                if (rowNum == 1) continue; // skip header
+
+                String[] cols = line.split(","); // simple CSV split
+                if (cols.length < 8) continue;   // ensure enough columns
+
+                String email = cols[2].trim();
+                if (email.isEmpty()) continue;
+
+                if (userRepository.findByEmail(email).isPresent()) continue;
+
+                boolean alreadyInBatch = users.stream()
+                        .anyMatch(u -> email.equalsIgnoreCase(u.getEmail()));
+                if (alreadyInBatch) continue;
+
+                UserEntity.Role role;
+                try {
+                    role = UserEntity.Role.valueOf(cols[6].trim().toUpperCase());
+                } catch (Exception e) {
+                    continue; // default if invalid
+                }
+
+                UserEntity user = UserEntity.builder()
+                        .username(cols[0].trim())
+                        .password(passwordEncoder.encode("vbsllp"))
+                        .email(email)
+                        .provider(cols[3].trim())
+                        .providerId(cols[4].trim())
+                        .location(cols[5].trim())
+                        .role(role)
+                        .tlEmail(cols[7].trim())
+                        .build();
+
+                users.add(user);
+            }
+
+            if (!users.isEmpty()) {
+                userRepository.saveAll(users);
+                users.forEach(userMetricsService::ensureMetrics);
+            }
+
+            return "Successfully uploaded " + users.size() + " users from CSV.";
+
+        } catch (IOException e) {
+            throw new RuntimeException("Error processing CSV file: " + e.getMessage(), e);
+        }
+    }
+
+    public String uploadUsersFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream();
              Workbook workbook = WorkbookFactory.create(is)) {
 
@@ -71,6 +129,18 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
         } catch (IOException e) {
             throw new RuntimeException("Error processing file: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public String uploadUsers(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        if (filename == null) throw new RuntimeException("File has no name");
+
+        if (filename.endsWith(".csv")) {
+            return uploadUsersFromCSV(file);
+        } else {
+            return uploadUsersFromExcel(file);
         }
     }
 
