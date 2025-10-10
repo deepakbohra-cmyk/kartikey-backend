@@ -3,10 +3,11 @@ package com.kartikey.kartikey.service.impl;
 import com.kartikey.kartikey.dto.user.ChangePasswordRequest;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
+import com.kartikey.kartikey.entity.FormData;
+import com.kartikey.kartikey.entity.QcFormData;
 import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
-import com.kartikey.kartikey.repository.UserMetricsRepository;
-import com.kartikey.kartikey.repository.UserRepository;
+import com.kartikey.kartikey.repository.*;
 import com.kartikey.kartikey.service.UserDataService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -23,6 +24,9 @@ public class UserDataServiceImpl implements UserDataService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMetricsRepository userMetricsRepository;
+    private final FormDataRepository formDataRepository;
+    private final FeedBackRepository feedBackRepository;
+    private final QcFormDataRepository qcFormDataRepository;
 
     @Override
     public List<UserDTO> getAllUser() {
@@ -119,12 +123,38 @@ public class UserDataServiceImpl implements UserDataService {
     }
 
     @Override
-    public void deleteUser(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new RuntimeException("User not found with id " + id);
+    @Transactional
+    public String deleteUser(Long id) {
+        // Find user
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id " + id));
+
+        try {
+            // Delete UserMetrics
+            userMetricsRepository.deleteByUser(user);
+
+            feedBackRepository.deleteByAgentOrQcReviewerOrTeamLead(user, user, user);
+
+            // Delete FormData created by user (if email matches)
+            List<FormData> forms = formDataRepository.findByEmail(user.getEmail());
+            for (FormData form : forms) {
+                // Cascade will delete associated FeedBack automatically if orphanRemoval = true
+                formDataRepository.delete(form);
+            }
+
+            List<QcFormData> qcForms = qcFormDataRepository.findByEmail(user.getEmail());
+            for (QcFormData qcForm : qcForms) {
+                qcFormDataRepository.delete(qcForm);
+            }
+            userRepository.delete(user);
+
+            return "User deleted successfully";
+
+        } catch (Exception e) {
+            throw new RuntimeException("Cannot delete user because some related data exists: " + e.getMessage());
         }
-        userRepository.deleteById(id);
     }
+
 
     @Override
     public UserDTO getUserById(Long id) {

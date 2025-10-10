@@ -100,19 +100,4 @@ public class FormDataServiceImpl implements FormDataService {
                 .build();
     }
 
-    @Scheduled(cron = "0 0 3 * * ?")
-    public void deleteOldFormData() {
-        LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
-
-        List<FormData> oldForms = formDataRepository.findByCreatedAtBefore(twoWeeksAgo);
-
-        for (FormData form : oldForms) {
-            boolean hasOpenFeedback = feedBackRepository.existsByFormDataAndStatusNot(form, FeedBack.Status.CLOSED);
-
-            if (!hasOpenFeedback) {
-                formDataRepository.delete(form);
-            }
-        }
-    }
-
 }

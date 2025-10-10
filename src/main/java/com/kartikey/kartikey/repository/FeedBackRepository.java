@@ -3,6 +3,8 @@ package com.kartikey.kartikey.repository;
 import com.kartikey.kartikey.entity.FeedBack;
 import com.kartikey.kartikey.entity.FeedBack.Status;
 import com.kartikey.kartikey.entity.FormData;
+import com.kartikey.kartikey.entity.QcFormData;
+import com.kartikey.kartikey.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -28,4 +30,5 @@ public interface FeedBackRepository extends JpaRepository<FeedBack, Long> {
     List<FeedBack> findByStatusAndUpdatedAtBefore(Status status, LocalDateTime dateTime);
 
     boolean existsByFormDataAndStatusNot(FormData formData, FeedBack.Status status);
+    void deleteByAgentOrQcReviewerOrTeamLead(UserEntity agent, UserEntity qc, UserEntity tl);
 }

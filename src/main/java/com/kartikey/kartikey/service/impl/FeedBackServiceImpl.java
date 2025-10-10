@@ -142,16 +142,4 @@ public class FeedBackServiceImpl implements FeedBackService {
         return toDTO(updated);
     }
 
-    @Scheduled(cron = "0 0 2 * * ?")
-    public void deleteOldClosedFeedback() {
-        LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
-
-        List<FeedBack> oldClosedFeedbacks = feedBackRepository
-                .findByStatusAndUpdatedAtBefore(FeedBack.Status.CLOSED, oneWeekAgo);
-
-        if (!oldClosedFeedbacks.isEmpty()) {
-            feedBackRepository.deleteAll(oldClosedFeedbacks);
-            System.out.println(oldClosedFeedbacks.size() + " old CLOSED feedback deleted.");
-        }
-    }
 }

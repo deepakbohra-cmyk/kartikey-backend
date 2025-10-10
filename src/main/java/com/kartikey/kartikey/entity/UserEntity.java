@@ -61,6 +61,8 @@ public class UserEntity {
         ADMIN,
         SUPERADMIN,
         L1TEAM,
-        QCTEAM
+        QCTEAM,
+        L1TL,
+        QCTL
     }
 }

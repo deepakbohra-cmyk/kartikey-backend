@@ -15,6 +15,6 @@ public interface FormDataRepository extends JpaRepository<FormData, Long> , JpaS
 
     @Query("SELECT f FROM FormData f WHERE f.gid LIKE CONCAT('%', :gid, '%')")
     List<FormData> findBySimilarGid(@Param("gid") String gid);
-
+    List<FormData> findByEmail(String email);
     List<FormData> findByCreatedAtBefore(LocalDateTime dateTime);
 }

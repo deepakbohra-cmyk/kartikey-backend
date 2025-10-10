@@ -19,6 +19,7 @@ import java.util.Optional;
 public interface UserMetricsRepository extends JpaRepository<UserMetrics , Long> , JpaSpecificationExecutor<UserMetrics> {
 
     Optional<UserMetrics> findByUser(UserEntity user);
+    void deleteByUser(UserEntity user);
 
     @Modifying
     @Transactional

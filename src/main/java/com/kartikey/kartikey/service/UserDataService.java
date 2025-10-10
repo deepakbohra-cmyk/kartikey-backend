@@ -10,7 +10,7 @@ public interface UserDataService {
     List<UserDTO> getAllUser();
     UserDTO addUser(UserEntityDTO userEntityDTO);
     UserDTO updateUser(Long id, UserEntityDTO userEntityDTO);  // नया method
-    void deleteUser(Long id);
+    String deleteUser(Long id);
     UserDTO getUserById(Long id);
     void changePassword(ChangePasswordRequest request);
     void resetPassword(String email);
