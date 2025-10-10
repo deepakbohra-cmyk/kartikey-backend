@@ -188,7 +188,7 @@ public class UserDataServiceImpl implements UserDataService {
         UserEntity user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found with email " + email));
 
-        String defaultPassword = "#*pass12*#";
+        String defaultPassword = "vbsllp";
         user.setPassword(passwordEncoder.encode(defaultPassword));
         userRepository.save(user);
     }

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 @Service
@@ -27,6 +28,21 @@ public class BulkUploadServiceImpl implements BulkUploadService {
     private final FormDataRepository formDataRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserMetricsService userMetricsService;
+
+    // Allowed roles list
+    private static final EnumSet<UserEntity.Role> ALLOWED_ROLES = EnumSet.allOf(UserEntity.Role.class);
+
+    @Override
+    public String uploadUsers(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        if (filename == null) throw new RuntimeException("File has no name");
+
+        if (filename.endsWith(".csv")) {
+            return uploadUsersFromCSV(file);
+        } else {
+            return uploadUsersFromExcel(file);
+        }
+    }
 
     private String uploadUsersFromCSV(MultipartFile file) {
         try (InputStream is = file.getInputStream();
@@ -40,34 +56,40 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 rowNum++;
                 if (rowNum == 1) continue; // skip header
 
-                String[] cols = line.split(","); // simple CSV split
-                if (cols.length < 8) continue;   // ensure enough columns
+                String[] cols = line.split(",");
+                if (cols.length < 5) continue; // not enough columns
 
-                String email = cols[2].trim();
-                if (email.isEmpty()) continue;
+                String username = cols[0].trim();
+                String email = cols[1].trim();
+                String roleStr = cols[2].trim();
+                String tlEmail = cols[3].trim();
+                String location = cols[4].trim();
 
-                if (userRepository.findByEmail(email).isPresent()) continue;
-
-                boolean alreadyInBatch = users.stream()
-                        .anyMatch(u -> email.equalsIgnoreCase(u.getEmail()));
-                if (alreadyInBatch) continue;
-
-                UserEntity.Role role;
-                try {
-                    role = UserEntity.Role.valueOf(cols[6].trim().toUpperCase());
-                } catch (Exception e) {
-                    continue; // default if invalid
+                // Skip if mandatory fields missing
+                if (username.isEmpty() || email.isEmpty() || roleStr.isEmpty() || location.isEmpty()) {
+                    continue;
                 }
 
+                // Validate role
+                UserEntity.Role role;
+                try {
+                    role = UserEntity.Role.valueOf(roleStr.toUpperCase());
+                    if (!ALLOWED_ROLES.contains(role)) continue;
+                } catch (Exception e) {
+                    continue;
+                }
+
+                // Skip duplicates in DB or batch
+                if (userRepository.findByEmail(email).isPresent()) continue;
+                if (users.stream().anyMatch(u -> email.equalsIgnoreCase(u.getEmail()))) continue;
+
                 UserEntity user = UserEntity.builder()
-                        .username(cols[0].trim())
-                        .password(passwordEncoder.encode("vbsllp"))
+                        .username(username)
                         .email(email)
-                        .provider(cols[3].trim())
-                        .providerId(cols[4].trim())
-                        .location(cols[5].trim())
                         .role(role)
-                        .tlEmail(cols[7].trim())
+                        .tlEmail(tlEmail)
+                        .location(location)
+                        .password(passwordEncoder.encode("vbsllp"))
                         .build();
 
                 users.add(user);
@@ -85,7 +107,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
         }
     }
 
-    public String uploadUsersFromExcel(MultipartFile file) {
+    private String uploadUsersFromExcel(MultipartFile file) {
         try (InputStream is = file.getInputStream();
              Workbook workbook = WorkbookFactory.create(is)) {
 
@@ -96,24 +118,32 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
-                String email = getCellValue(row.getCell(2));
-                if (email == null) continue;
+                String username = getCellValue(row.getCell(0));
+                String email = getCellValue(row.getCell(1));
+                String roleStr = getCellValue(row.getCell(2));
+                String tlEmail = getCellValue(row.getCell(3));
+                String location = getCellValue(row.getCell(4));
 
-                // skip duplicates
+                if (isBlank(username) || isBlank(email) || isBlank(roleStr) || isBlank(location)) continue;
+
+                UserEntity.Role role;
+                try {
+                    role = UserEntity.Role.valueOf(roleStr.toUpperCase());
+                    if (!ALLOWED_ROLES.contains(role)) continue;
+                } catch (Exception e) {
+                    continue;
+                }
+
                 if (userRepository.findByEmail(email).isPresent()) continue;
-                boolean alreadyInBatch = users.stream()
-                        .anyMatch(u -> email.equalsIgnoreCase(u.getEmail()));
-                if (alreadyInBatch) continue;
+                if (users.stream().anyMatch(u -> email.equalsIgnoreCase(u.getEmail()))) continue;
 
                 UserEntity user = UserEntity.builder()
-                        .username(getCellValue(row.getCell(0)))
-                        .password(passwordEncoder.encode("vbsllp"))
+                        .username(username)
                         .email(email)
-                        .provider(getCellValue(row.getCell(3)))
-                        .providerId(getCellValue(row.getCell(4)))
-                        .location(getCellValue(row.getCell(5)))
-                        .role(UserEntity.Role.valueOf(getCellValue(row.getCell(6)).toUpperCase()))
-                        .tlEmail(getCellValue(row.getCell(7)))
+                        .role(role)
+                        .tlEmail(tlEmail)
+                        .location(location)
+                        .password(passwordEncoder.encode("vbsllp"))
                         .build();
 
                 users.add(user);
@@ -121,26 +151,13 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
             if (!users.isEmpty()) {
                 userRepository.saveAll(users);
-
                 users.forEach(userMetricsService::ensureMetrics);
             }
 
-            return "Successfully uploaded " + users.size() + " users.";
+            return "Successfully uploaded " + users.size() + " users from Excel.";
 
         } catch (IOException e) {
-            throw new RuntimeException("Error processing file: " + e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public String uploadUsers(MultipartFile file) {
-        String filename = file.getOriginalFilename();
-        if (filename == null) throw new RuntimeException("File has no name");
-
-        if (filename.endsWith(".csv")) {
-            return uploadUsersFromCSV(file);
-        } else {
-            return uploadUsersFromExcel(file);
+            throw new RuntimeException("Error processing Excel file: " + e.getMessage(), e);
         }
     }
 
@@ -156,21 +173,27 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                 Row row = sheet.getRow(i);
                 if (row == null) continue;
 
+                String email = getCellValue(row.getCell(0));
                 String workTypeStr = getCellValue(row.getCell(1));
+                String gid = getCellValue(row.getCell(2));
+                String decision = getCellValue(row.getCell(3));
+
+                if (email == null || email.isBlank()) continue;
+
                 FormData.WorkType workType = null;
                 if (workTypeStr != null && !workTypeStr.isBlank()) {
                     try {
                         workType = FormData.WorkType.valueOf(workTypeStr.trim().toUpperCase());
                     } catch (IllegalArgumentException e) {
-                        throw new RuntimeException("Invalid workType value at row " + (i + 1) + ": " + workTypeStr);
+                        continue;
                     }
                 }
 
                 FormData form = FormData.builder()
-                        .email(getCellValue(row.getCell(0)))
+                        .email(email)
                         .workType(workType)
-                        .gid(getCellValue(row.getCell(2)))
-                        .decision(getCellValue(row.getCell(3)))
+                        .gid(gid)
+                        .decision(decision)
                         .build();
 
                 forms.add(form);
@@ -178,18 +201,14 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
             if (!forms.isEmpty()) {
                 formDataRepository.saveAll(forms);
-
-                // ✅ Increment 'formFilled' metric for each user (by email)
-                forms.forEach(f -> {
-                    userRepository.findByEmail(f.getEmail())
-                            .ifPresent(userMetricsService::incrementFormFilled);
-                });
+                forms.forEach(f -> userRepository.findByEmail(f.getEmail())
+                        .ifPresent(userMetricsService::incrementFormFilled));
             }
 
             return "Successfully uploaded " + forms.size() + " forms.";
 
         } catch (IOException e) {
-            throw new RuntimeException("Error processing file: " + e.getMessage(), e);
+            throw new RuntimeException("Error processing form file: " + e.getMessage(), e);
         }
     }
 
@@ -200,9 +219,11 @@ public class BulkUploadServiceImpl implements BulkUploadService {
             case STRING -> cell.getStringCellValue().trim();
             case NUMERIC -> String.valueOf((long) cell.getNumericCellValue());
             case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
-            case BLANK -> null;
             default -> null;
         };
     }
-}
 
+    private boolean isBlank(String s) {
+        return s == null || s.trim().isEmpty();
+    }
+}
