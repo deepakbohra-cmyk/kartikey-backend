@@ -53,7 +53,7 @@ public class UserDataServiceImpl implements UserDataService {
         UserEntity user = UserEntity.builder()
                 .username(userEntityDTO.getUsername())
                 .email(userEntityDTO.getEmail())
-                .password(passwordEncoder.encode(userEntityDTO.getPassword()))
+                .password(passwordEncoder.encode("vbsllp"))
                 .role(UserEntity.Role.valueOf(userEntityDTO.getRole()))
                 .tlEmail(userEntityDTO.getTlEmail())
                 .location(userEntityDTO.getLocation())

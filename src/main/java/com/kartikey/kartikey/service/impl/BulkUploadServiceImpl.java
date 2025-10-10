@@ -12,10 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,36 +28,49 @@ public class BulkUploadServiceImpl implements BulkUploadService {
 
     @Override
     public String uploadUsers(MultipartFile file) {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+        try (InputStream is = file.getInputStream();
+             Workbook workbook = WorkbookFactory.create(is)) {
+
+            Sheet sheet = workbook.getSheetAt(0);
             List<UserEntity> users = new ArrayList<>();
-            String line;
-            br.readLine();
-            while ((line = br.readLine()) != null) {
-                String[] cols = line.split(",");
-                String email = cols[2].trim();
-                if (email.isEmpty() || userRepository.findByEmail(email).isPresent()) continue;
+
+            for (int i = 1; i <= sheet.getLastRowNum(); i++) {
+                Row row = sheet.getRow(i);
+                if (row == null) continue;
+
+                String email = getCellValue(row.getCell(2));
+                if (email == null) continue;
+
+                // skip duplicates
+                if (userRepository.findByEmail(email).isPresent()) continue;
+                boolean alreadyInBatch = users.stream()
+                        .anyMatch(u -> email.equalsIgnoreCase(u.getEmail()));
+                if (alreadyInBatch) continue;
 
                 UserEntity user = UserEntity.builder()
-                        .username(cols[0].trim())
-                        .password(passwordEncoder.encode(cols[1].trim()))
+                        .username(getCellValue(row.getCell(0)))
+                        .password(passwordEncoder.encode("vbsllp"))
                         .email(email)
-                        .provider(cols[3].trim())
-                        .providerId(cols[4].trim())
-                        .location(cols[5].trim())
-                        .role(UserEntity.Role.valueOf(cols[6].trim().toUpperCase()))
-                        .tlEmail(cols[7].trim())
+                        .provider(getCellValue(row.getCell(3)))
+                        .providerId(getCellValue(row.getCell(4)))
+                        .location(getCellValue(row.getCell(5)))
+                        .role(UserEntity.Role.valueOf(getCellValue(row.getCell(6)).toUpperCase()))
+                        .tlEmail(getCellValue(row.getCell(7)))
                         .build();
+
                 users.add(user);
             }
 
             if (!users.isEmpty()) {
                 userRepository.saveAll(users);
+
                 users.forEach(userMetricsService::ensureMetrics);
             }
+
             return "Successfully uploaded " + users.size() + " users.";
 
         } catch (IOException e) {
-            throw new RuntimeException("Error processing CSV file: " + e.getMessage(), e);
+            throw new RuntimeException("Error processing file: " + e.getMessage(), e);
         }
     }
 
