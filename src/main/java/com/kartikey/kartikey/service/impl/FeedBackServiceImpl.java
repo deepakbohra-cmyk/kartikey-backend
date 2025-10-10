@@ -14,6 +14,7 @@ import com.kartikey.kartikey.service.EmailService;
 import com.kartikey.kartikey.service.FeedBackService;
 import com.kartikey.kartikey.service.UserMetricsService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +31,9 @@ public class FeedBackServiceImpl implements FeedBackService {
     private final FormDataRepository formDataRepository;
     private final EmailService emailService;
     private final UserMetricsService userMetricsService;
+
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
 
     @Override
     @Transactional
@@ -73,6 +77,7 @@ public class FeedBackServiceImpl implements FeedBackService {
         }
 
         String decision = formData.getDecision();
+        String link = frontendUrl + "/feedback";
 
         if (tl != null) {
             String subject = "ACTION REQUIRED: New Feedback for GID" + formData.getGid() + "- Agent:" + agent.getEmail();
@@ -92,7 +97,7 @@ public class FeedBackServiceImpl implements FeedBackService {
                     (qc != null ? qc.getEmail() : "N/A") + "</strong>.</p>" +
                     "<p>Once the feedback is resolved, click the link below to mark it as closed:</p>" +
                     "<p style=\"text-align: center; margin-top: 25px;\">" +
-                    "<a href=\"http://localhost:5173/feedback\" " +
+                    "<a href=\"" + link + "\" " +
                     "style=\"display: inline-block; padding: 12px 25px; background-color: #28a745; color: white; " +
                     "text-decoration: none; border-radius: 5px; font-weight: bold;\">Confirm Feedback Closed</a>" +
                     "</p>" +
@@ -100,7 +105,7 @@ public class FeedBackServiceImpl implements FeedBackService {
                     "<p>Best regards,<br>The Glimpse Lens System</p>" +
                     "</div>";
 
-            String[] cc = { "ritik.rana@vacobinary.in" };
+            String[] cc = { agent.getEmail() , tl.getEmail() };
             emailService.sendFeedbackNotification(qc.getEmail(), cc, subject, body);
         }
 
@@ -136,7 +141,7 @@ public class FeedBackServiceImpl implements FeedBackService {
         FeedBack feedback = feedBackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback not found with id: " + id));
 
-        feedback.setStatus(FeedBack.Status.valueOf(status.toUpperCase())); // ensure valid enum
+        feedback.setStatus(FeedBack.Status.valueOf(status.toUpperCase()));
         FeedBack updated = feedBackRepository.save(feedback);
 
         return toDTO(updated);

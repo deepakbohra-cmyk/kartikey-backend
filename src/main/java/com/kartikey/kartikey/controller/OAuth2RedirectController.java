@@ -11,7 +11,7 @@ import java.io.IOException;
 @Controller
 public class OAuth2RedirectController {
 
-    @Value("${app.frontend.url:http://localhost:5173}")
+    @Value("${app.frontend.url}")
     private String frontendUrl;
 
     @GetMapping("/oauth2/redirect")

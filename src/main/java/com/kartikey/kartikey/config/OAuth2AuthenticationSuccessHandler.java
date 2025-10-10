@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
@@ -26,6 +27,9 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
     private final UserService userService;
     private final ObjectMapper objectMapper;
 
+    @Value("${app.frontend.url}")
+    private String frontendUrl;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
@@ -39,10 +43,11 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 
         // ✅ Redirect directly to frontend with token
         String redirectUrl = String.format(
-                "http://localhost:5173/oauth2/redirect"
-                        + "?token=" + token
-                        + "&email=" + userEntity.getEmail()
-                        + "&role=" + userEntity.getRole().name()
+                "%s/oauth2/redirect?token=%s&email=%s&role=%s",
+                frontendUrl,
+                token,
+                userEntity.getEmail(),
+                userEntity.getRole().name()
         );
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
