@@ -1,0 +1,12 @@
+
+services:
+  backend:
+    build: .
+    container_name: kartikey-backend
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data  # Persist H2 database between container restarts
+    restart: unless-stopped
