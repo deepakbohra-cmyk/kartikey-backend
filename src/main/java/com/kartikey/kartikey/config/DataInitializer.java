@@ -22,7 +22,7 @@ public class DataInitializer implements CommandLineRunner {
             UserEntity superAdmin = UserEntity.builder()
                     .username("Super Admin")
                     .email(email)
-                    .password(passwordEncoder.encode("Super@123")) // default password
+                    .password(passwordEncoder.encode("Super@123"))
                     .role(UserEntity.Role.SUPERADMIN)
                     .location("Default Location")
                     .provider("local")
