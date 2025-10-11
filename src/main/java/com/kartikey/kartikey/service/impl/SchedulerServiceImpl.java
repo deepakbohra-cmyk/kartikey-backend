@@ -21,7 +21,8 @@ public class SchedulerServiceImpl {
     private final UserMetricsRepository userMetricsRepository;
     private final QcFormDataRepository qcFormDataRepository;
 
-    @Scheduled(cron = "0 0 3 * * ?")
+    // 🕓 4 AM → Delete old FormData if no open feedback or linked QC
+    @Scheduled(cron = "0 0 4 * * ?")
     public void deleteOldFormData() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
 
@@ -29,37 +30,49 @@ public class SchedulerServiceImpl {
 
         for (FormData form : oldForms) {
             boolean hasOpenFeedback = feedBackRepository.existsByFormDataAndStatusNot(form, FeedBack.Status.CLOSED);
+            boolean hasQc = qcFormDataRepository.existsByFormData(form);
 
-            if (!hasOpenFeedback) {
-                formDataRepository.delete(form);
+            if (!hasOpenFeedback && !hasQc) {
+                try {
+                    formDataRepository.delete(form);
+                    System.out.println("🗑 Deleted FormData ID: " + form.getId());
+                } catch (Exception e) {
+                    System.err.println("❌ Could not delete FormData ID " + form.getId() + ": " + e.getMessage());
+                }
             }
         }
     }
 
+    // 🕒 3 AM → Delete old QC FormData
     @Scheduled(cron = "0 0 3 * * ?")
     public void deleteOldQcFormData() {
         LocalDateTime twoWeeksAgo = LocalDateTime.now().minusWeeks(2);
-
         List<QcFormData> oldForms = qcFormDataRepository.findByCreatedAtBefore(twoWeeksAgo);
 
         for (QcFormData form : oldForms) {
+            try {
                 qcFormDataRepository.delete(form);
+                System.out.println("🗑 Deleted QCFormData ID: " + form.getId());
+            } catch (Exception e) {
+                System.err.println("❌ Could not delete QCFormData ID " + form.getId() + ": " + e.getMessage());
+            }
         }
     }
 
+    // 🕑 2 AM → Delete closed feedbacks older than 1 week
     @Scheduled(cron = "0 0 2 * * ?")
     public void deleteOldClosedFeedback() {
         LocalDateTime oneWeekAgo = LocalDateTime.now().minusWeeks(1);
-
-        List<FeedBack> oldClosedFeedbacks = feedBackRepository
-                .findByStatusAndUpdatedAtBefore(FeedBack.Status.CLOSED, oneWeekAgo);
+        List<FeedBack> oldClosedFeedbacks =
+                feedBackRepository.findByStatusAndUpdatedAtBefore(FeedBack.Status.CLOSED, oneWeekAgo);
 
         if (!oldClosedFeedbacks.isEmpty()) {
             feedBackRepository.deleteAll(oldClosedFeedbacks);
-            System.out.println(oldClosedFeedbacks.size() + " old CLOSED feedback deleted.");
+            System.out.println("🗑 Deleted " + oldClosedFeedbacks.size() + " old CLOSED feedback(s).");
         }
     }
 
+    // 🕛 Every 2 hours → Recalculate feedback scores
     @Scheduled(cron = "0 0 0/2 * * ?")
     public void setFeedBackScore() {
         List<UserMetrics> allMetrics = userMetricsRepository.findAll();
@@ -73,7 +86,7 @@ public class SchedulerServiceImpl {
 
                 double score = 0;
                 if (feedbackGiven > 0) {
-                    score = (double) (qcFilled / feedbackGiven) * 100;
+                    score = ((double) qcFilled / feedbackGiven) * 100;
                 }
 
                 metrics.setScore(score);
@@ -82,7 +95,6 @@ public class SchedulerServiceImpl {
         }
 
         userMetricsRepository.saveAll(allMetrics);
-
-        System.out.println("User metrics scores updated for L1TEAM users.");
+        System.out.println("✅ User metrics scores updated for L1TEAM users.");
     }
 }

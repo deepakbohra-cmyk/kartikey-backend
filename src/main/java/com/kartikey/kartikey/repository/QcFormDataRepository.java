@@ -1,5 +1,6 @@
 package com.kartikey.kartikey.repository;
 
+import com.kartikey.kartikey.entity.FormData;
 import com.kartikey.kartikey.entity.QcFormData;
 import com.kartikey.kartikey.entity.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -15,4 +16,5 @@ public interface QcFormDataRepository extends JpaRepository<QcFormData , Long> ,
     List<QcFormData> findByEmailOrderByCreatedAtDesc(String email);
     List<QcFormData> findByEmail(String email);
     List<QcFormData> findByCreatedAtBefore(LocalDateTime dateTime);
+    boolean existsByFormData(FormData formData);
 }

@@ -31,4 +31,5 @@ public interface FeedBackRepository extends JpaRepository<FeedBack, Long> {
 
     boolean existsByFormDataAndStatusNot(FormData formData, FeedBack.Status status);
     void deleteByAgentOrQcReviewerOrTeamLead(UserEntity agent, UserEntity qc, UserEntity tl);
+    boolean existsByFormData(FormData formData);
 }
