@@ -30,7 +30,7 @@ public class SchedulerServiceImpl {
 
         for (FormData form : oldForms) {
             boolean hasOpenFeedback = feedBackRepository.existsByFormDataAndStatusNot(form, FeedBack.Status.CLOSED);
-            boolean hasQc = qcFormDataRepository.existsByFormData(form);
+            boolean hasQc = qcFormDataRepository.existsByFormId(form);
 
             if (!hasOpenFeedback && !hasQc) {
                 try {

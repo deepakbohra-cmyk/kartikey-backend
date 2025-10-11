@@ -16,5 +16,5 @@ public interface QcFormDataRepository extends JpaRepository<QcFormData , Long> ,
     List<QcFormData> findByEmailOrderByCreatedAtDesc(String email);
     List<QcFormData> findByEmail(String email);
     List<QcFormData> findByCreatedAtBefore(LocalDateTime dateTime);
-    boolean existsByFormData(FormData formData);
+    boolean existsByFormId(FormData form);
 }

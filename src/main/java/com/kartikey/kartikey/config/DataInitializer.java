@@ -23,7 +23,7 @@ public class DataInitializer implements CommandLineRunner {
                     .username("Super Admin")
                     .email(email)
                     .password(passwordEncoder.encode("Super@123"))
-                    .role(UserEntity.Role.SUPERADMIN)
+                    .role(UserEntity.Role.ADMIN)
                     .location("Default Location")
                     .provider("local")
                     .build();
