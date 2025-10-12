@@ -22,8 +22,11 @@ WORKDIR /app
 # Copy the JAR from the build stage
 COPY --from=build /app/target/kartikey-0.0.1-SNAPSHOT.jar app.jar
 
-# Expose Spring Boot port
-EXPOSE 8080
+# Expose the port dynamically (Cloud Run sets $PORT)
+EXPOSE ${PORT:-8080}
+
+# Ensure env variables from Cloud Run are passed to Java
+ENV JAVA_TOOL_OPTIONS="-Dserver.port=${PORT:-8080}"
 
 # Start the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
