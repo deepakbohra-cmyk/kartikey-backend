@@ -26,6 +26,7 @@ public class DataInitializer implements CommandLineRunner {
                     .role(UserEntity.Role.ADMIN)
                     .location("Default Location")
                     .provider("local")
+                    .isActive(true)
                     .build();
 
             userRepository.save(superAdmin);

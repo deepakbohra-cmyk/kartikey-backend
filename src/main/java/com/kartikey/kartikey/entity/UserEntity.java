@@ -42,7 +42,9 @@ public class UserEntity {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    // Reverse mappings
+    @Column(name = "status" , nullable = false)
+    private boolean isActive = true;
+
     @OneToMany(mappedBy = "agent")
     private List<FeedBack> feedbacksAsAgent;
 
@@ -65,4 +67,5 @@ public class UserEntity {
         L1TL,
         QCTL
     }
+
 }

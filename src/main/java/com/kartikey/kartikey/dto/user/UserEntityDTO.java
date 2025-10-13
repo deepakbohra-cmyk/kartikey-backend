@@ -14,5 +14,5 @@ public class UserEntityDTO {
     private String role;
     private String tlEmail;
     private String location;
-    private String password;  // केवल add user में इस्तेमाल होगा
+    private String password;
 }

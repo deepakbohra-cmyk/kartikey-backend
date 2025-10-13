@@ -3,8 +3,6 @@ package com.kartikey.kartikey.service.impl;
 import com.kartikey.kartikey.dto.user.ChangePasswordRequest;
 import com.kartikey.kartikey.dto.user.UserDTO;
 import com.kartikey.kartikey.dto.user.UserEntityDTO;
-import com.kartikey.kartikey.entity.FormData;
-import com.kartikey.kartikey.entity.QcFormData;
 import com.kartikey.kartikey.entity.UserEntity;
 import com.kartikey.kartikey.entity.UserMetrics;
 import com.kartikey.kartikey.repository.*;
@@ -30,7 +28,8 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Override
     public List<UserDTO> getAllUser() {
-        List<UserEntity> users = userRepository.findAll();
+         List<UserEntity> users = userRepository.findByIsActiveTrue();
+
         return users.stream()
                 .map(user -> new UserDTO(
                         user.getId(),
@@ -38,7 +37,8 @@ public class UserDataServiceImpl implements UserDataService {
                         user.getEmail(),
                         user.getRole().name(),
                         user.getTlEmail(),
-                        user.getLocation()
+                        user.getLocation(),
+                        user.isActive()
                 ))
                 .collect(Collectors.toList());
     }
@@ -72,7 +72,8 @@ public class UserDataServiceImpl implements UserDataService {
                 saved.getEmail(),
                 saved.getRole().name(),
                 saved.getTlEmail(),
-                saved.getLocation()
+                saved.getLocation(),
+                saved.isActive()
         );
     }
 
@@ -81,7 +82,6 @@ public class UserDataServiceImpl implements UserDataService {
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
 
-        // only update fields if they are present (not null / not blank)
         if (userEntityDTO.getUsername() != null && !userEntityDTO.getUsername().isBlank()) {
             user.setUsername(userEntityDTO.getUsername());
         }
@@ -118,43 +118,23 @@ public class UserDataServiceImpl implements UserDataService {
                 updated.getEmail(),
                 updated.getRole().name(),
                 updated.getTlEmail(),
-                updated.getLocation()
+                updated.getLocation(),
+                updated.isActive()
         );
     }
 
     @Override
     @Transactional
     public String deleteUser(Long id) {
-        // Find user
         UserEntity user = userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
 
-        try {
-            // Delete UserMetrics
-            userMetricsRepository.deleteByUser(user);
+        // 👉 Soft delete (deactivate user)
+        user.setActive(false);
+        userRepository.save(user);
 
-            feedBackRepository.deleteByAgentOrQcReviewerOrTeamLead(user, user, user);
-
-            // Delete FormData created by user (if email matches)
-            List<FormData> forms = formDataRepository.findByEmail(user.getEmail());
-            for (FormData form : forms) {
-                // Cascade will delete associated FeedBack automatically if orphanRemoval = true
-                formDataRepository.delete(form);
-            }
-
-            List<QcFormData> qcForms = qcFormDataRepository.findByEmail(user.getEmail());
-            for (QcFormData qcForm : qcForms) {
-                qcFormDataRepository.delete(qcForm);
-            }
-            userRepository.delete(user);
-
-            return "User deleted successfully";
-
-        } catch (Exception e) {
-            throw new RuntimeException("Cannot delete user because some related data exists: " + e.getMessage());
-        }
+        return "User deactivated successfully";
     }
-
 
     @Override
     public UserDTO getUserById(Long id) {
@@ -165,7 +145,8 @@ public class UserDataServiceImpl implements UserDataService {
                         user.getEmail(),
                         user.getRole().name(),
                         user.getTlEmail(),
-                        user.getLocation()
+                        user.getLocation(),
+                        user.isActive()
                 ))
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
     }
@@ -192,5 +173,4 @@ public class UserDataServiceImpl implements UserDataService {
         user.setPassword(passwordEncoder.encode(defaultPassword));
         userRepository.save(user);
     }
-
 }

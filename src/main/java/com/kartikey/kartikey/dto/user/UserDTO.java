@@ -12,4 +12,5 @@ public class UserDTO {
     private String role;
     private String tlEmail;
     private String location;
+    private boolean active;
 }
