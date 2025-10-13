@@ -1,5 +1,20 @@
+version: "3.9"
 
 services:
+  db:
+    image: mysql:8.0
+    container_name: kartikey-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      MYSQL_DATABASE: kartikeydb
+      MYSQL_USER: ${SPRING_DATASOURCE_USERNAME}
+      MYSQL_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    restart: unless-stopped
+
   backend:
     build: .
     container_name: kartikey-backend
@@ -7,6 +22,9 @@ services:
       - "8080:8080"
     env_file:
       - .env
-    volumes:
-      - ./data:/app/data  # Persist H2 database between container restarts
+    depends_on:
+      - db
     restart: unless-stopped
+
+volumes:
+  db-data:
