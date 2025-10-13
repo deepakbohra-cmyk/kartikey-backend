@@ -57,6 +57,7 @@ public class UserDataServiceImpl implements UserDataService {
                 .role(UserEntity.Role.valueOf(userEntityDTO.getRole()))
                 .tlEmail(userEntityDTO.getTlEmail())
                 .location(userEntityDTO.getLocation())
+                .isActive(true)
                 .build();
 
         UserEntity saved = userRepository.save(user);

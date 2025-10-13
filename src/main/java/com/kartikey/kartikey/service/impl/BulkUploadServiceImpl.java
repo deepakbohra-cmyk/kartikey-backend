@@ -89,6 +89,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                         .role(role)
                         .tlEmail(tlEmail)
                         .location(location)
+                        .isActive(true)
                         .password(passwordEncoder.encode("vbsllp"))
                         .build();
 
@@ -143,6 +144,7 @@ public class BulkUploadServiceImpl implements BulkUploadService {
                         .role(role)
                         .tlEmail(tlEmail)
                         .location(location)
+                        .isActive(true)
                         .password(passwordEncoder.encode("vbsllp"))
                         .build();
 
