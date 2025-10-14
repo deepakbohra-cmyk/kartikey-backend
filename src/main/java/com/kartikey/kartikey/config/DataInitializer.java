@@ -25,6 +25,7 @@ public class DataInitializer implements CommandLineRunner {
                     .password(passwordEncoder.encode("Super@123"))
                     .role(UserEntity.Role.ADMIN)
                     .location("Default Location")
+                    .isActive(true)
                     .provider("local")
                     .build();
 

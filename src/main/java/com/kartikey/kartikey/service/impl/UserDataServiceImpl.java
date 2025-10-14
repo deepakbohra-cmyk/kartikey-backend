@@ -30,7 +30,7 @@ public class UserDataServiceImpl implements UserDataService {
 
     @Override
     public List<UserDTO> getAllUser() {
-        List<UserEntity> users = userRepository.findAll();
+        List<UserEntity> users = userRepository.findByIsActiveTrue();
         return users.stream()
                 .map(user -> new UserDTO(
                         user.getId(),
@@ -38,6 +38,7 @@ public class UserDataServiceImpl implements UserDataService {
                         user.getEmail(),
                         user.getRole().name(),
                         user.getTlEmail(),
+                        user.isActive(),
                         user.getLocation()
                 ))
                 .collect(Collectors.toList());
@@ -56,6 +57,7 @@ public class UserDataServiceImpl implements UserDataService {
                 .password(passwordEncoder.encode("vbsllp"))
                 .role(UserEntity.Role.valueOf(userEntityDTO.getRole()))
                 .tlEmail(userEntityDTO.getTlEmail())
+                .isActive(true)
                 .location(userEntityDTO.getLocation())
                 .build();
 
@@ -72,6 +74,7 @@ public class UserDataServiceImpl implements UserDataService {
                 saved.getEmail(),
                 saved.getRole().name(),
                 saved.getTlEmail(),
+                saved.isActive(),
                 saved.getLocation()
         );
     }
@@ -118,6 +121,7 @@ public class UserDataServiceImpl implements UserDataService {
                 updated.getEmail(),
                 updated.getRole().name(),
                 updated.getTlEmail(),
+                updated.isActive(),
                 updated.getLocation()
         );
     }
@@ -130,26 +134,9 @@ public class UserDataServiceImpl implements UserDataService {
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
 
         try {
-            // Delete UserMetrics
-            userMetricsRepository.deleteByUser(user);
-
-            feedBackRepository.deleteByAgentOrQcReviewerOrTeamLead(user, user, user);
-
-            // Delete FormData created by user (if email matches)
-            List<FormData> forms = formDataRepository.findByEmail(user.getEmail());
-            for (FormData form : forms) {
-                // Cascade will delete associated FeedBack automatically if orphanRemoval = true
-                formDataRepository.delete(form);
-            }
-
-            List<QcFormData> qcForms = qcFormDataRepository.findByEmail(user.getEmail());
-            for (QcFormData qcForm : qcForms) {
-                qcFormDataRepository.delete(qcForm);
-            }
-            userRepository.delete(user);
-
-            return "User deleted successfully";
-
+            user.setActive(false);
+            userRepository.save(user);
+            return "User deactivated successfully with id " + id;
         } catch (Exception e) {
             throw new RuntimeException("Cannot delete user because some related data exists: " + e.getMessage());
         }
@@ -165,6 +152,7 @@ public class UserDataServiceImpl implements UserDataService {
                         user.getEmail(),
                         user.getRole().name(),
                         user.getTlEmail(),
+                        user.isActive(),
                         user.getLocation()
                 ))
                 .orElseThrow(() -> new RuntimeException("User not found with id " + id));
