@@ -1,0 +1,19 @@
+Index: src/main/resources/application.properties
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+># ============================\n# ? APPLICATION CONFIGURATION\n# ============================\nspring.application.name=kartikey\nserver.port=${PORT:8080}\n\n# ============================\n# ?? H2 DATABASE CONFIGURATION (PERSISTENT FILE)\n# ============================\n# Absolute path use karo taki redeploy par data na jaye.\nspring.datasource.url=jdbc:h2:file:./kartikey-data/testdb\nspring.datasource.driver-class-name=org.h2.Driver\nspring.datasource.username=${SPRING_DATASOURCE_USERNAME:sa}\nspring.datasource.password=${SPRING_DATASOURCE_PASSWORD:}\n\nspring.h2.console.enabled=true\n\n# ============================\n# ? JPA / HIBERNATE CONFIGURATION\n# ============================\nspring.jpa.database-platform=org.hibernate.dialect.H2Dialect\nspring.jpa.hibernate.ddl-auto=update\nspring.jpa.show-sql=true\nspring.jpa.defer-datasource-initialization=true\nspring.jpa.open-in-view=false\nspring.jpa.properties.hibernate.format_sql=true\n\n# ============================\n# ? SQL INIT\n# ============================\nspring.sql.init.mode=always\n\n# ============================\n# ? OAUTH2 CONFIGURATION\n# ============================\n# GitHub OAuth2\nspring.security.oauth2.client.registration.github.client-id=${GITHUB_CLIENT_ID:your-github-client-id}\nspring.security.oauth2.client.registration.github.client-secret=${GITHUB_CLIENT_SECRET:your-github-client-secret}\nspring.security.oauth2.client.registration.github.scope=read:user,user:email\n\n# Google OAuth2\nspring.security.oauth2.client.registration.google.client-id=${GOOGLE_CLIENT_ID}\nspring.security.oauth2.client.registration.google.client-secret=${GOOGLE_CLIENT_SECRET}\nspring.security.oauth2.client.registration.google.scope=openid,profile,email\n\n# ============================\n# ? JWT CONFIGURATION\n# ============================\njwt.secret=${JWT_SECRET}\njwt.expirationMs=86400000\n\n# ============================\n# ? FRONTEND REDIRECT CONFIGURATION\n# ============================\napp.frontend.url=${FRONTEND_URL}\napp.oauth2.redirect-uri=${OAUTH2_REDIRECT_URI}\n\n# ============================\n# ? EMAIL CONFIGURATION\n# ============================\nspring.mail.host=${SPRING_MAIL_HOST}\nspring.mail.port=${SPRING_MAIL_PORT}\nspring.mail.username=${SPRING_MAIL_USERNAME}\nspring.mail.password=${SPRING_MAIL_PASSWORD}\nspring.mail.properties.mail.smtp.auth=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_AUTH}\nspring.mail.properties.mail.smtp.starttls.enable=${SPRING_MAIL_PROPERTIES_MAIL_SMTP_STARTTLS_ENABLE}\n\n# ============================\n# ? LOGGING CONFIGURATION\n# ============================\nlogging.level.com.kartikey=DEBUG\nlogging.level.org.springframework.security=DEBUG\nlogging.pattern.console=%d{yyyy-MM-dd HH:mm:ss} - %msg%n\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>ISO-8859-1
+===================================================================
+diff --git a/src/main/resources/application.properties b/src/main/resources/application.properties
+--- a/src/main/resources/application.properties	(revision 2e321d63197cc237b1c7fda46096eba771e4c387)
++++ b/src/main/resources/application.properties	(date 1760426941620)
+@@ -28,7 +28,7 @@
+ # ============================
+ # ? SQL INIT
+ # ============================
+-spring.sql.init.mode=always
++spring.sql.init.mode=never 
+ 
+ # ============================
+ # ? OAUTH2 CONFIGURATION
